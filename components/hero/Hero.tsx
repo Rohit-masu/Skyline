@@ -39,7 +39,7 @@ export function Hero() {
           alt="Skyline - Slender 28-storey architectural residential tower illuminated at twilight"
           fill
           priority
-          sizes="100vw"
+          sizes="(max-aspect-ratio: 16/9) 178vh, 100vw"
           className="object-cover object-center scale-105 transform motion-safe:transition-transform motion-safe:duration-1000"
         />
 

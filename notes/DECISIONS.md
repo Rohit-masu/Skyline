@@ -6,3 +6,4 @@ One line each: what — why — rejected alternative.
 - All pages dark — matches the approved mockup (docs/mockup-v1.png) — light listing pages.
 
 ## Assumptions
+- S1 Arrival hero uses fixed-ratio high-res architectural render with dark editorial gradient vignettes — guarantees immediate LCP and AA contrast — pure WebGL hero was rejected because of initial blank canvas.

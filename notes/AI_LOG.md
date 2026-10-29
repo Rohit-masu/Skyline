@@ -15,3 +15,6 @@ One line each: what the AI got wrong — how it was caught — fix.
 - Ran `next build` into the same `.next` folder as a running `next dev` — the dev page reloaded in a loop — build into a separate folder (`NEXT_DIST_DIR=.next-prod`).
 - Two apostrophes in two separate CSS comments made the CSS pipeline silently drop every rule between them — compiled CSS was missing the rules although the file had them — keep apostrophes out of CSS comments.
 - Started 3D before the story and art direction were fixed; the look drifted — Rohit reviewed screenshots — restarted with a static storytelling V1 (LANDING_V1_PLAN.md).
+- LayoutProps<"/"> in app/layout.tsx caused TS2304 type error — caught via npm run typecheck — replaced with standard React.ReactNode type.
+- new Date() in Footer.tsx triggered Next.js 16 blocking prerender warning during next build — caught via npm run build — replaced with static 2026 constant.
+- Hero image sizes updated to (max-aspect-ratio: 16/9) 178vh, 100vw to ensure phone sharpness per team notes.
