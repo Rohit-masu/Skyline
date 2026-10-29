@@ -1,15 +1,19 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
-/*
- * Keep apostrophes out of comments in this file: two of them in separate
- * comments made the CSS pipeline silently drop every rule in between.
- */
 @theme {
-  --color-ink: #0e1420;
-  --color-slate: #1c2533;
+  --color-ink: #0a0f18;
+  --color-ink-deep: #06090f;
+  --color-slate: #141d2b;
+  --color-slate-light: #1f2c40;
   --color-brass: #c9a36a;
-  --color-ivory: #f3eee6;
-  --color-mist: #9aa3b2;
+  --color-brass-light: #dfba82;
+  --color-brass-dark: #a6814b;
+  --color-ivory: #f4eee5;
+  --color-ivory-dim: #d8d0c2;
+  --color-mist: #8f9ba8;
+  --color-border: rgba(201, 163, 106, 0.2);
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
@@ -17,10 +21,80 @@
 html {
   color-scheme: dark;
   background: var(--color-ink);
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--color-ink);
   color: var(--color-ivory);
   font-family: var(--font-sans);
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Subtle architectural film grain texture overlay */
+.bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* Luxury button styling */
+.btn-brass {
+  background: linear-gradient(135deg, #dfba82 0%, #c9a36a 50%, #ad864e 100%);
+  color: #0a0f18;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(201, 163, 106, 0.25);
+}
+
+.btn-brass:hover {
+  background: linear-gradient(135deg, #f0cb95 0%, #d8b277 50%, #bd9357 100%);
+  box-shadow: 0 6px 28px rgba(201, 163, 106, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-outline-brass {
+  border: 1px solid rgba(201, 163, 106, 0.4);
+  color: var(--color-ivory);
+  backdrop-filter: blur(8px);
+  background: rgba(20, 29, 43, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-outline-brass:hover {
+  border-color: var(--color-brass);
+  background: rgba(201, 163, 106, 0.1);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Hairline borders */
+.border-brass-hairline {
+  border-color: rgba(201, 163, 106, 0.25);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink);
+}
+::-webkit-scrollbar-thumb {
+  background: #1f2c40;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brass);
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
