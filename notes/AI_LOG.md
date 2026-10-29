@@ -18,3 +18,5 @@ One line each: what the AI got wrong — how it was caught — fix.
 - LayoutProps<"/"> in app/layout.tsx caused TS2304 type error — caught via npm run typecheck — replaced with standard React.ReactNode type.
 - new Date() in Footer.tsx triggered Next.js 16 blocking prerender warning during next build — caught via npm run build — replaced with static 2026 constant.
 - Hero image sizes updated to (max-aspect-ratio: 16/9) 178vh, 100vw to ensure phone sharpness per team notes.
+- Indexed array accesses in scripts/generate_properties.ts triggered TS18048 under noUncheckedIndexedAccess — caught via npm run typecheck — resolved with non-null assertions.
+- PowerShell Set-Content with [slug] path failed due to wildcard character interpretation — caught via command error — resolved using -LiteralPath parameter.
