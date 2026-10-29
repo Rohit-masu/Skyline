@@ -11,3 +11,5 @@ One line each: what — why — rejected alternative.
 - S1 Arrival hero uses fixed-ratio high-res architectural render with dark editorial gradient vignettes — guarantees immediate LCP and AA contrast — pure WebGL hero was rejected because of initial blank canvas.
 - Phase 2 API uses shared Zod schemas (query and enquiry) and in-memory persistent cache for rate limiting — guarantees sub-5ms response times and zero external dependency risk during local / offline evaluation.
 - Phase 3 listings page uses Suspense boundary wrapping useSearchParams client component — guarantees no SSR de-optimization and smooth hydration across Next.js App Router.
+- Server-rendered /properties/[slug] with generateStaticParams for all 56 residences — instant TTFB, full per-property OpenGraph SEO metadata, and real 404 for unknown slugs — purely client-side fetching.
+- EnquiryForm client-side validation parity with Zod schema and input retention on error — ensures zero user data loss on failed validation or network drops — wiping form state on failed submits.

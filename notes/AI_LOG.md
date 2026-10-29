@@ -22,3 +22,4 @@ One line each: what the AI got wrong — how it was caught — fix.
 - PowerShell Set-Content with [slug] path failed due to wildcard character interpretation — caught via command error — resolved using -LiteralPath parameter.
 - Raw Rupee symbol literal in echo bash command created UTF-8 replacement chars — caught via npm run typecheck — used standard \u20B9 Unicode escape in lib/format.ts.
 - Vitest missing path alias @ configuration — caught via vitest run — configured vitest.config.ts with path alias.
+- Unstable new Date() during static prerender of Client Component EnquiryForm triggered Next.js 16 blocking prerender error — caught via NEXT_DIST_DIR=.next-prod npm run build — deferred live date calculation to useEffect with static fallback limits.
