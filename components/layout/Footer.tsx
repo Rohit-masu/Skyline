@@ -104,7 +104,7 @@ export function Footer() {
             </span>
             <div className="space-y-3 text-xs font-sans">
               <p className="text-[#8f9ba8] leading-relaxed">
-                Skyline Experience Pavilion, Sector 63, Golf Course Extension Rd, Gurugram, Haryana 122002
+                Skyline by Reeltor Experience Pavilion, Sector 128, Noida Expressway, Uttar Pradesh 201304
               </p>
               <div className="flex items-center gap-2 text-[#f4eee5] hover:text-[#c9a36a] transition-colors">
                 <Phone className="w-3.5 h-3.5 text-[#c9a36a]" />
@@ -120,7 +120,7 @@ export function Footer() {
 
         {/* Bottom Legal / Disclaimer */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#8f9ba8]/60 gap-4">
-          <p>© 2026 Skyline Residences. All architectural designs and renders are creative representations.</p>
+          <p>© 2026 Skyline Residences by Reeltor. All architectural designs and renders are creative representations.</p>
           <div className="flex items-center gap-6">
             <span className="hover:text-[#8f9ba8] cursor-pointer">Privacy Policy</span>
             <span className="hover:text-[#8f9ba8] cursor-pointer">Terms of Living</span>

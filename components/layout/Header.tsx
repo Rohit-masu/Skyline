@@ -60,7 +60,7 @@ export function Header() {
               <span className="h-1.5 w-1.5 rounded-full bg-[#c9a36a] inline-block animate-pulse" />
             </div>
             <span className="text-[9px] tracking-[0.35em] uppercase text-[#8f9ba8] font-sans -mt-0.5">
-              Elevated Living · Golf Course Rd
+              Elevated Living · Noida Expressway · Reeltor
             </span>
           </Link>
 

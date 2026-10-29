@@ -5,8 +5,13 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AltitudeRail } from "@/components/ui/AltitudeRail";
 import { Hero } from "@/components/hero/Hero";
+import { TowerStorySection } from "@/components/story/TowerStorySection";
+import { PROPERTIES_DATA } from "@/data/properties";
+import { PropertyCard } from "@/components/properties/PropertyCard";
 
 export default function HomePage() {
+  const featuredProperties = PROPERTIES_DATA.filter((p) => p.featured).slice(0, 6);
+
   return (
     <div className="relative min-h-screen bg-[#0a0f18] text-[#f4eee5] selection:bg-[#c9a36a] selection:text-[#0a0f18]">
       {/* Site-wide Header & Altitude Navigation Rail */}
@@ -14,7 +19,7 @@ export default function HomePage() {
       <AltitudeRail />
 
       <main>
-        {/* S1: Arrival (Cinematic Hero) */}
+        {/* S1: Arrival (Cinematic Hero with Static Fallback for Immediate LCP) */}
         <Hero />
 
         {/* S2: Manifesto Section */}
@@ -44,81 +49,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* S3: The Ascent Story / The Making */}
-        <section
-          id="story"
-          className="relative py-28 lg:py-36 px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto"
-          aria-label="The Ascent Architectural Story"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* Story Text Left */}
-            <div className="lg:col-span-5 space-y-6">
-              <span className="text-[11px] uppercase tracking-[0.3em] text-[#c9a36a] font-sans font-medium block">
-                03 —— THE ASCENT
-              </span>
-              <h2 className="font-display text-3xl sm:text-5xl font-light text-[#f4eee5] leading-tight">
-                A landmark, <span className="italic text-[#c9a36a]">taking shape</span> in the sky.
-              </h2>
-              <p className="text-sm sm:text-base text-[#8f9ba8] font-sans font-light leading-relaxed">
-                Rising 28 floors on Golf Course Road, Skyline integrates structural post-tensioned 
-                engineering with bespoke warm brass facade louvres that respond naturally to solar paths.
-              </p>
-
-              {/* Milestones / Floor Stages */}
-              <div className="space-y-4 pt-4">
-                <div className="p-4 rounded-xl bg-[#141d2b]/50 border border-[rgba(201,163,106,0.15)] flex items-start gap-4">
-                  <div className="p-2.5 rounded-lg bg-[#c9a36a]/10 text-[#c9a36a]">
-                    <Building2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-base text-[#f4eee5]">Levels 01–04 · The Podium & Gardens</h3>
-                    <p className="text-xs text-[#8f9ba8] mt-0.5">Grand double-height arrival lobby, landscaped green lawns and cantilevered infinity pool.</p>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-[#141d2b]/50 border border-[rgba(201,163,106,0.15)] flex items-start gap-4">
-                  <div className="p-2.5 rounded-lg bg-[#c9a36a]/10 text-[#c9a36a]">
-                    <Layers className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-base text-[#f4eee5]">Levels 05–23 · The Sky Residences</h3>
-                    <p className="text-xs text-[#8f9ba8] mt-0.5">Spacious 2, 3 and 4 BHK residences with 11-foot finished ceilings and 3-side panoramic views.</p>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-[#141d2b]/50 border border-[rgba(201,163,106,0.15)] flex items-start gap-4">
-                  <div className="p-2.5 rounded-lg bg-[#c9a36a]/10 text-[#c9a36a]">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-base text-[#f4eee5]">Levels 24–28 · Wellness Suite & Crown</h3>
-                    <p className="text-xs text-[#8f9ba8] mt-0.5">Level 24 panoramic fitness pavilion and Level 28 private open-air sky lounge.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Visual Stage Right */}
-            <div className="lg:col-span-7 relative">
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-[rgba(201,163,106,0.25)] shadow-2xl group">
-                <Image
-                  src="/images/properties/property-exterior-crest.jpg"
-                  alt="Skyline Tower Architectural Grand Entrance"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-transparent to-transparent opacity-80" />
-                <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-xs font-mono text-[#f4eee5]">
-                  <span className="bg-[#0a0f18]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-[rgba(201,163,106,0.3)]">
-                    ARCHITECTURAL WATERFALL & PODIUM
-                  </span>
-                  <span className="text-[#c9a36a]">PHASE 1 COMPLETE</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* S3: Scroll-driven 3D Story (Lazy-loaded Three.js Tower Experience) */}
+        <TowerStorySection />
 
         {/* S4: Inside A Home (Floor Plan & Interior Showcase) */}
         <section
@@ -130,7 +62,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="space-y-4 max-w-2xl">
                 <span className="text-[11px] uppercase tracking-[0.3em] text-[#c9a36a] font-sans font-medium block">
-                  04 —— RESIDENCE BLUEPRINTS
+                  03 —— RESIDENCE BLUEPRINTS
                 </span>
                 <h2 className="font-display text-3xl sm:text-5xl font-light text-[#f4eee5] leading-tight">
                   Step <span className="italic text-[#c9a36a]">inside</span> pure refinement.
@@ -152,48 +84,35 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Interactive Cutaway Blueprint Showcase */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Left: 3D Cutaway Plan */}
-              <div className="lg:col-span-7 relative">
-                <div className="relative aspect-square rounded-2xl overflow-hidden border border-[rgba(201,163,106,0.2)] bg-[#141d2b]/30 p-2 shadow-2xl">
-                  <Image
-                    src="/images/landing/floorplan-3bhk.jpg"
-                    alt="3 BHK Architectural Cutaway Floor Plan"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 55vw"
-                    className="object-contain p-4"
-                  />
-                  <div className="absolute top-6 left-6 bg-[#0a0f18]/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[rgba(201,163,106,0.25)] text-xs font-mono text-[#c9a36a]">
-                    SUITE 1802 · 2,450 SQ FT
-                  </div>
+            {/* Blueprint Showcase */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-7 rounded-2xl overflow-hidden border border-[rgba(201,163,106,0.25)] relative aspect-[16/10] bg-[#0c121c]">
+                <Image
+                  src="/images/landing/interior-living.jpg"
+                  alt="Skyline 3 BHK Master Living Pavilion"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-transparent to-transparent opacity-80" />
+                <div className="absolute top-4 left-4 bg-[#0a0f18]/85 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] font-mono text-[#c9a36a] border border-[rgba(201,163,106,0.3)]">
+                  LEVEL 18 · SIGNATURE SKY SUITE
                 </div>
               </div>
 
-              {/* Right: Living Room Reality Interior Photo & Features */}
               <div className="lg:col-span-5 space-y-6">
-                <div className="relative aspect-[16/10] rounded-xl overflow-hidden border border-[rgba(201,163,106,0.2)] shadow-xl">
-                  <Image
-                    src="/images/landing/interior-living.jpg"
-                    alt="Living room interior with double height ceiling and panoramic windows"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 40vw"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-transparent to-transparent opacity-60" />
-                  <span className="absolute bottom-4 left-4 text-xs font-mono text-[#f4eee5] bg-[#0a0f18]/80 px-3 py-1 rounded-full">
-                    Double-Height Grand Living Lounge
-                  </span>
+                <div className="space-y-3">
+                  <span className="text-xs font-mono text-[#c9a36a] uppercase">FLOOR PLAN SPECIFICATIONS</span>
+                  <h3 className="font-display text-2xl text-[#f4eee5]">The 3 BHK Grand Living Deck</h3>
+                  <p className="text-xs text-[#8f9ba8] leading-relaxed">
+                    Designed with 11-foot clear finished ceilings and floor-to-ceiling double-glazed thermal acoustic glass, framing uninterrupted panoramic views of Sector 128 Noida.
+                  </p>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5 pt-2">
                   <div className="flex items-center justify-between text-sm py-2 border-b border-[rgba(255,255,255,0.06)]">
-                    <span className="text-[#8f9ba8]">Master Bedroom Suite</span>
-                    <span className="text-[#f4eee5] font-mono">18&apos; x 15&apos; with Walk-in Wardrobe</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm py-2 border-b border-[rgba(255,255,255,0.06)]">
-                    <span className="text-[#8f9ba8]">Living & Dining Salon</span>
-                    <span className="text-[#f4eee5] font-mono">26&apos; x 18&apos; with Italian Marble</span>
+                    <span className="text-[#8f9ba8]">Carpet Area</span>
+                    <span className="text-[#f4eee5] font-mono">2,450 sq.ft</span>
                   </div>
                   <div className="flex items-center justify-between text-sm py-2 border-b border-[rgba(255,255,255,0.06)]">
                     <span className="text-[#8f9ba8]">Sunset Balcony Deck</span>
@@ -209,10 +128,47 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* S5: Podium Amenities */}
+        {/* S5: Featured Residences Portfolio Strip */}
+        <section
+          id="featured"
+          className="relative py-28 lg:py-36 px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto"
+          aria-label="Featured Residences"
+        >
+          <div className="space-y-12">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+              <div className="space-y-3 max-w-2xl">
+                <span className="text-[11px] uppercase tracking-[0.3em] text-[#c9a36a] font-mono block">
+                  04 —— FEATURED SELECTION
+                </span>
+                <h2 className="font-display text-3xl sm:text-5xl font-light text-[#f4eee5] leading-tight">
+                  Hand-Curated <span className="italic text-[#c9a36a]">Residences</span>
+                </h2>
+                <p className="text-sm text-[#8f9ba8] font-sans font-light">
+                  A preview of our most exclusive penthouses, duplex suites, and sky apartments.
+                </p>
+              </div>
+
+              <Link
+                href="/properties"
+                className="btn-outline-brass px-6 py-3 rounded-xl text-xs uppercase tracking-widest font-mono flex items-center gap-2 hover:bg-[#c9a36a] hover:text-[#0a0f18] transition-colors"
+              >
+                <span>View All 56 Residences</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {featuredProperties.map((prop, idx) => (
+                <PropertyCard key={prop.id} property={prop} priority={idx < 3} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* S6: Podium & Sky Amenities */}
         <section
           id="amenities"
-          className="relative py-28 lg:py-36 px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto"
+          className="relative py-28 lg:py-36 px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto border-t border-[rgba(201,163,106,0.12)]"
           aria-label="Podium Amenities"
         >
           <div className="space-y-16">
@@ -228,7 +184,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* 3 Pillars of Amenities Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Card 1: Infinity Pool */}
               <div className="group rounded-2xl overflow-hidden bg-[#141d2b]/40 border border-[rgba(201,163,106,0.18)] hover:border-[#c9a36a] transition-all duration-300">
@@ -308,7 +263,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* S9: Private Visit Call to Action */}
+        {/* S7: Private Visit Call to Action */}
         <section
           id="cta"
           className="relative py-32 px-6 sm:px-8 lg:px-12 bg-gradient-to-b from-[#0a0f18] via-[#0e1624] to-[#06090f] border-t border-[rgba(201,163,106,0.2)] text-center overflow-hidden"
@@ -324,7 +279,7 @@ export default function HomePage() {
             </h2>
 
             <p className="text-base sm:text-lg text-[#8f9ba8] max-w-xl mx-auto font-sans font-light leading-relaxed">
-              Step into the Skyline Sales Pavilion on Golf Course Road for a private viewing 
+              Step into the Skyline Experience Pavilion by Reeltor on Noida Expressway (Sector 128) for a private viewing 
               of architectural mockups and customized floor specifications.
             </p>
 

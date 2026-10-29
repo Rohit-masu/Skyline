@@ -13,3 +13,5 @@ One line each: what — why — rejected alternative.
 - Phase 3 listings page uses Suspense boundary wrapping useSearchParams client component — guarantees no SSR de-optimization and smooth hydration across Next.js App Router.
 - Server-rendered /properties/[slug] with generateStaticParams for all 56 residences — instant TTFB, full per-property OpenGraph SEO metadata, and real 404 for unknown slugs — purely client-side fetching.
 - EnquiryForm client-side validation parity with Zod schema and input retention on error — ensures zero user data loss on failed validation or network drops — wiping form state on failed submits.
+- Location customized to Sector 128, Noida Expressway & Reeltor Experience Pavilion — directly aligns the application with Reeltor brand and assignment context while preserving the luxury architectural identity.
+- Procedural Three.js geometry for 28-storey tower with dynamic lazy loading — avoids heavy multi-megabyte GLTF model downloads, keeps initial route bundle minimal, and guarantees smooth 60fps scroll-driven floor assembly.

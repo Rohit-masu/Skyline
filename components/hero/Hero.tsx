@@ -63,9 +63,9 @@ export function Hero() {
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-12 flex items-center justify-between text-xs text-[#8f9ba8] font-mono tracking-wider pt-2">
         <div className="flex items-center gap-2">
           <Compass className="w-3.5 h-3.5 text-[#c9a36a]" />
-          <span>28.4595° N, 77.0266° E</span>
+          <span>28.5355° N, 77.3910° E</span>
           <span className="text-[rgba(201,163,106,0.3)]">·</span>
-          <span className="text-[#f4eee5]/80">GOLF COURSE ROAD, GURGAON</span>
+          <span className="text-[#f4eee5]/80">SECTOR 128, NOIDA EXPRESSWAY · REELTOR</span>
         </div>
 
         <div className="hidden sm:flex items-center gap-2">
