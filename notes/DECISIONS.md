@@ -72,3 +72,4 @@ One line each: what — why — rejected alternative.
 - Featured cards are one link each (title ::after covers the card) — the old card had two links to the same page, an extra tab stop per home.
 - Bento rows have fixed heights (auto-rows) so the grid never shifts while images load (CLS).
 - "Open now" uses the visitor's clock in IST, read with useSyncExternalStore on the client only (prerendered page → no hydration mismatch).
+- Minimal pass after Rohit's review ("navbar, footer look crowded"; references: reeltor.com, vantooptics.vercel.app): header = wordmark + 4 links + one outline CTA, fixed 72 px height (no resize on scroll), no tagline; footer = one CTA line + 3 columns + legal line, marquee and the BHK link column removed (the listings filters already do that), watermark lighter.

@@ -77,7 +77,3 @@ export function getPortfolioStats() {
     lowestPrice: Math.min(...PROPERTIES_DATA.map((property) => property.price)),
   };
 }
-
-export function getCities(): string[] {
-  return [...new Set(PROPERTIES_DATA.map((property) => property.city))];
-}

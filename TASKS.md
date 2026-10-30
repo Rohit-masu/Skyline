@@ -31,7 +31,7 @@ Commands: `npm run dev` · `npm run typecheck` · `npm run lint` · `npm test` �
 1. ~~Deploy~~ Done: https://skyline-rho-seven.vercel.app (auto-deploys from main). Verified on production: all routes, 404 status, API 400s, CDN cache HIT, enquiry saved to Neon (201).
 2. **First-load JS over budget** (~190 KB gz vs 130/120); React DOM + Next runtime are most of it. Measure with `npm run analyze`.
 3. **Reports in `/reports`**: Lighthouse mobile on the deployed site + bundle analyzer.
-4. **UI polish**: Featured (06), Visit (07) and footer done (shared heading, one container, scroll animations). Left: mobile header tagline wraps to two lines.
+4. **UI polish (Rohit review)**: 1 navbar ✅ · 2 footer ✅ · 3 story→06 transition (ambient glow, no hard cut) · 4 hero minimal + loading state.
 5. **3D on real hardware** (mid-range laptop / Android).
 6. **AI_USAGE.md** (Rohit, from `notes/AI_LOG.md`) and the **screen recording**.
 

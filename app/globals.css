@@ -251,7 +251,7 @@ body {
   opacity: 1;
 }
 
-/* Outlined display numbers (01–06) and the footer marquee. */
+/* Outlined display numbers (01–06 on the featured cards). */
 .text-outline {
   color: transparent;
   -webkit-text-stroke: 1px rgba(223, 186, 130, 0.55);
@@ -283,15 +283,6 @@ body {
   to {
     transform: rotate(360deg);
   }
-}
-
-/* Endless outlined-city marquee in the footer (same technique as the hero ticker). */
-.marquee {
-  animation: ticker 40s linear infinite;
-}
-
-.marquee-wrap:hover .marquee {
-  animation-play-state: paused;
 }
 
 /* Hairline borders */
