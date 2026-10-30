@@ -62,39 +62,20 @@ export default function PropertiesPage({ searchParams }: { searchParams: SearchP
         </nav>
 
         {/* Editorial Masthead with Inline Stats matching the Reference Image */}
-        <header className="mb-12 grid grid-cols-1 items-end justify-between gap-8 lg:grid-cols-12 border-b border-white/5 pb-10">
-          <div className="space-y-4 lg:col-span-8">
-            <p className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.3em] text-brass">
-              <span aria-hidden="true" className="h-px w-8 bg-brass" />
-              Portfolio 2026 · {stats.homes} residences
-            </p>
-            <h1 className="font-display text-4xl font-light leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+        {/* Quiet masthead: one line of facts instead of a stats block (the landing already has one). */}
+        <header className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="space-y-3">
+            <h1 className="font-display text-4xl font-light leading-tight tracking-tight sm:text-5xl">
               Skyline <span className="italic text-brass">Residences</span>
             </h1>
-            <p className="max-w-2xl text-base font-light leading-relaxed text-mist">
-              From light-filled sky apartments and duplex penthouses to private garden villas, find the home that fits
-              how you live.
+            <p className="max-w-xl text-sm font-light leading-relaxed text-mist sm:text-base">
+              Sky apartments, duplex penthouses and garden villas, all open for a private visit.
             </p>
           </div>
-
-          <div className="flex items-center gap-5 sm:gap-8 lg:col-span-4 lg:justify-end">
-            <div className="flex flex-col">
-              <span className="font-display text-2xl font-light text-ivory sm:text-3xl">{stats.homes}</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-mist/80">Residences</span>
-            </div>
-            <span className="h-8 w-px bg-white/10" aria-hidden="true" />
-            <div className="flex flex-col">
-              <span className="font-display text-2xl font-light text-ivory sm:text-3xl">{TOTAL_FLOORS}</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-mist/80">Floors</span>
-            </div>
-            <span className="h-8 w-px bg-white/10" aria-hidden="true" />
-            <div className="flex flex-col">
-              <span className="font-display text-2xl font-light text-ivory sm:text-3xl">
-                ₹{lowestCrore}<span className="text-xl text-brass"> Cr</span>
-              </span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-mist/80">Starting price</span>
-            </div>
-          </div>
+          <p className="text-[11px] uppercase tracking-[0.25em] text-mist">
+            {stats.homes} residences <span className="text-brass">·</span> {TOTAL_FLOORS} floors{" "}
+            <span className="text-brass">·</span> from ₹{lowestCrore} Cr
+          </p>
         </header>
 
         <Suspense fallback={<PropertyListingsSkeleton count={PAGE_SIZE} />}>

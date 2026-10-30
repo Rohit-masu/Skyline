@@ -86,3 +86,5 @@ Listings, detail, form and API files are not written up here yet; AGENTS.md §7�
 - `FeaturedHomes.tsx` — stats band (`data-count`, numbers from `getPortfolioStats()`), bento grid via `TILE_CLASSES` (first tile 2×2).
 - `VisitBadge.tsx` (SVG textPath ring, `.spin-slow`), `VisitSteps.tsx` (`data-draw-line` scrubbed line), `OpenStatus.tsx` (IST hours from `lib/site.ts`, checked every minute).
 - Footer marquee: two copies of the city list (`getCities()`), `.marquee` moves by one list width; pauses on hover.
+- `components/properties/PriceRange.tsx` — min/max price selects and the rule that clears the other side when a range becomes impossible. `compact` = desktop search row (screen-reader labels), otherwise the drawer.
+- `components/landing/SiteIntro.tsx` — intro veil; `.site-intro` rules in globals.css do the hiding (data-scene-mode or 2.4 s cap). sessionStorage key `skyline:intro-seen`.

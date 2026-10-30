@@ -13,3 +13,9 @@ export const PAVILION = {
 
 export const TOTAL_FLOORS = 28;
 export const TOTAL_HOMES = 56;
+
+// Placeholder profiles for the fictional project (open the networks' home pages).
+export const SOCIAL_LINKS = [
+  { label: "Instagram", href: "https://www.instagram.com/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/" },
+] as const;

@@ -1,15 +1,31 @@
 import Link from "next/link";
-import { ArrowUp, ArrowUpRight } from "lucide-react";
-import { PAVILION, TOTAL_FLOORS, TOTAL_HOMES } from "@/lib/site";
+import { ArrowUp, ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
+import { PAVILION, SOCIAL_LINKS, TOTAL_HOMES } from "@/lib/site";
 
-const EXPLORE_LINKS = [
-  { label: "Residences", href: "/properties" },
-  { label: "The tower", href: "/#arrival" },
-  { label: "Amenities", href: "/#pool" },
-  { label: "Visit", href: "/#visit" },
+const LINK_COLUMNS = [
+  {
+    title: "Discover",
+    links: [
+      { label: "Residences", href: "/properties" },
+      { label: "The tower", href: "/#arrival" },
+      { label: "Amenities", href: "/#pool" },
+      { label: "Inside a home", href: "/#inside" },
+    ],
+  },
+  {
+    title: "Experience",
+    links: [
+      { label: "3D tour", href: "/#build" },
+      { label: "Visit the pavilion", href: "/#visit" },
+      { label: "Book a visit", href: "/properties" },
+      { label: "Contact", href: `mailto:${PAVILION.email}` },
+    ],
+  },
 ];
 
-const columnTitle = "text-[11px] uppercase tracking-[0.25em] text-ivory/90";
+const columnTitle = "text-[11px] uppercase tracking-[0.25em] text-brass";
+// Hairline between columns on wide screens (like the reference footer); none when stacked.
+const columnDivider = "lg:border-l lg:border-white/5 lg:pl-10";
 
 // Quiet, three-column footer. Shown on every page, so the motion is CSS only (scroll-driven,
 // .footer-reveal in globals.css): no GSAP on listings/detail, and without support it simply shows.
@@ -35,34 +51,57 @@ export function Footer() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-10 py-14 sm:grid-cols-[1.5fr_1fr_1.2fr]">
-          <div className="footer-reveal space-y-4" style={{ "--i": 1 } as React.CSSProperties}>
+        <div className="grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.4fr] lg:gap-0">
+          <div className="footer-reveal space-y-5 lg:pr-10" style={{ "--i": 1 } as React.CSSProperties}>
             <Link href="/" aria-label="Skyline home" className="inline-flex items-center gap-2">
-              <span className="font-display text-lg font-light tracking-[0.32em] text-ivory">SKYLINE</span>
-              <span aria-hidden="true" className="h-1 w-1 rounded-full bg-brass" />
+              <span className="font-display text-2xl font-light tracking-[0.32em] text-ivory">SKYLINE</span>
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brass" />
             </Link>
             <p className="max-w-xs text-sm font-light leading-relaxed">
-              {TOTAL_HOMES} residences across {TOTAL_FLOORS} floors above Noida Expressway.
+              Elevated living, thoughtfully imagined. {TOTAL_HOMES} residences above Noida Expressway.
             </p>
-          </div>
-
-          <nav aria-label="Footer" className="footer-reveal space-y-4" style={{ "--i": 2 } as React.CSSProperties}>
-            <h2 className={columnTitle}>Explore</h2>
-            <ul className="space-y-2.5 text-sm">
-              {EXPLORE_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="link-underline hover:text-ivory">{link.label}</Link>
+            <ul className="flex items-center gap-5 pt-1 text-[11px] uppercase tracking-[0.2em]">
+              {SOCIAL_LINKS.map((social, index) => (
+                <li key={social.label} className={index > 0 ? "border-l border-white/10 pl-5" : ""}>
+                  <a href={social.href} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-1.5 hover:text-ivory">
+                    {social.label}
+                    <ArrowUpRight aria-hidden="true" className="h-3 w-3 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    <span className="sr-only">(opens in a new tab)</span>
+                  </a>
                 </li>
               ))}
             </ul>
-          </nav>
+          </div>
 
-          <div className="footer-reveal space-y-4" style={{ "--i": 3 } as React.CSSProperties}>
-            <h2 className={columnTitle}>Visit</h2>
-            <address className="space-y-2.5 text-sm not-italic">
-              <p className="max-w-[16rem]">{PAVILION.address}</p>
-              <p><a href={`tel:${PAVILION.phoneHref}`} className="link-underline hover:text-ivory">{PAVILION.phone}</a></p>
-              <p><a href={`mailto:${PAVILION.email}`} className="link-underline break-all hover:text-ivory">{PAVILION.email}</a></p>
+          {LINK_COLUMNS.map((column, index) => (
+            <nav key={column.title} aria-label={column.title} className={`footer-reveal space-y-4 ${columnDivider}`} style={{ "--i": index + 2 } as React.CSSProperties}>
+              <h2 className={columnTitle}>{column.title}</h2>
+              <ul className="space-y-2.5 text-sm">
+                {column.links.map((link) => (
+                  <li key={link.label}>
+                    <Link href={link.href} className="link-underline hover:text-ivory">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+
+          <div className={`footer-reveal space-y-4 ${columnDivider}`} style={{ "--i": 4 } as React.CSSProperties}>
+            <h2 className={columnTitle}>Get in touch</h2>
+            <address className="space-y-3 text-sm not-italic">
+              <a href={`tel:${PAVILION.phoneHref}`} className="group flex items-center gap-3 hover:text-ivory">
+                <Phone aria-hidden="true" className="h-4 w-4 shrink-0 text-brass transition-transform duration-200 group-hover:scale-110" />
+                {PAVILION.phone}
+              </a>
+              <a href={`mailto:${PAVILION.email}`} className="group flex items-center gap-3 break-all hover:text-ivory">
+                <Mail aria-hidden="true" className="h-4 w-4 shrink-0 text-brass transition-transform duration-200 group-hover:scale-110" />
+                {PAVILION.email}
+              </a>
+              <a href={PAVILION.mapsUrl} target="_blank" rel="noopener noreferrer" className="group flex items-start gap-3 hover:text-ivory">
+                <MapPin aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brass transition-transform duration-200 group-hover:scale-110" />
+                <span className="max-w-[15rem]">{PAVILION.address}</span>
+                <span className="sr-only">(opens Maps in a new tab)</span>
+              </a>
             </address>
           </div>
         </div>

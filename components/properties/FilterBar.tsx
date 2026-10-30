@@ -6,6 +6,7 @@ import type { PropertySort } from "@/types/property";
 import { SORT_OPTIONS, hasActiveFilters, type PropertyQuery } from "@/lib/schema/query";
 import { SearchBox } from "./SearchBox";
 import { FilterControls } from "./FilterControls";
+import { PriceRange } from "./PriceRange";
 import { ActiveFilterChips } from "./ActiveFilterChips";
 
 const SORT_LABELS: Record<PropertySort, string> = {
@@ -38,6 +39,10 @@ export function FilterBar({ query, onFiltersChange, onSearchChange, onReset, tot
         <SearchBox value={query.q} onCommit={onSearchChange} />
 
         <div className="flex items-center gap-3">
+          {/* Price joins the search row on desktop, so the filter row below stays one line. */}
+          <div className="hidden lg:block">
+            <PriceRange query={query} onChange={onFiltersChange} idPrefix="desktop" compact />
+          </div>
           <div className="relative flex-1 lg:flex-initial">
             <label htmlFor="listing-sort" className="sr-only">Sort homes</label>
             <ArrowUpDown aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-brass" />
@@ -69,7 +74,7 @@ export function FilterBar({ query, onFiltersChange, onSearchChange, onReset, tot
         </div>
       </div>
 
-      <div className="hidden items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#0e1624]/80 p-3 shadow-lg backdrop-blur-md lg:flex">
+      <div className="hidden items-center justify-between gap-4 border-y border-white/5 py-3 lg:flex">
         <FilterControls query={query} onChange={onFiltersChange} idPrefix="desktop" layout="row" />
         {hasActiveFilters(query) && (
           <button type="button" onClick={onReset} className="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-brass hover:text-brass-light font-mono">

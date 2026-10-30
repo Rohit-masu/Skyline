@@ -9,7 +9,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   images: {
-    formats: ["image/avif", "image/webp"],
+    // WebP only: AVIF is ~20% smaller but much slower to encode, and the first visitor to each
+    // image size waits for that encode (images felt slow to appear).
+    formats: ["image/webp"],
   },
   turbopack: {
     rules: {

@@ -225,6 +225,51 @@ body {
   }
 }
 
+/* ---------- Landing intro veil (components/landing/SiteIntro.tsx) ---------- */
+
+/* Hard cap: fades out by itself after 2.4 s even if the 3D never reports in (or JS fails). */
+.site-intro {
+  animation: intro-out 700ms ease-out 2.4s forwards;
+}
+
+/* SceneLoader sets data-scene-mode on the first 3D frame or when it picks the static story.
+   The short delay keeps a very fast load from flashing the veil for a split second. */
+html[data-scene-mode] .site-intro {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 700ms ease-out 500ms, visibility 0s linear 1.2s;
+}
+
+.site-intro-word {
+  animation: fade-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.site-intro-progress {
+  animation: intro-progress 2.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes intro-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes intro-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-intro {
+    display: none;
+  }
+}
+
 /* ---------- Trendy details (own CSS, no component library) ---------- */
 
 /* Glow that follows the pointer: --spot-x/--spot-y are written by animations.ts (data-spotlight).

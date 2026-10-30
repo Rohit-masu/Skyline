@@ -2,26 +2,22 @@
 
 import type { PropertyType } from "@/types/property";
 import { BHK_OPTIONS, PROPERTY_TYPES, type PropertyQuery } from "@/lib/schema/query";
-import { formatPrice } from "@/lib/format";
-
-// Price steps for the min/max selects, in rupees (25 L … 10 Cr). "No max" covers 10 Cr+.
-export const PRICE_STEPS = [
-  2_500_000, 5_000_000, 7_500_000, 10_000_000, 15_000_000, 20_000_000, 30_000_000, 50_000_000, 100_000_000,
-];
+import { PriceRange } from "./PriceRange";
 
 interface FilterControlsProps {
   query: PropertyQuery;
   onChange: (changes: Partial<PropertyQuery>) => void;
   /** Keeps ids unique, because the desktop row and the mobile drawer render this twice. */
   idPrefix: string;
+  /** Row: one quiet line on desktop (price lives in the search row). Stack: the mobile drawer. */
   layout: "row" | "stack";
 }
 
-const toggleButton = (pressed: boolean, layout: "row" | "stack" = "row") =>
-  `min-h-9 rounded-lg px-3 text-xs transition-colors duration-150 cursor-pointer ${
+const toggleButton = (pressed: boolean, layout: "row" | "stack") =>
+  `min-h-9 rounded-full px-3.5 text-xs transition-colors duration-200 cursor-pointer ${
     pressed
       ? "bg-brass font-semibold text-ink"
-      : `text-mist hover:bg-white/5 hover:text-ivory ${layout === "stack" ? "border border-white/10 bg-slate" : ""}`
+      : `text-mist hover:text-ivory ${layout === "stack" ? "border border-white/10 bg-slate" : "hover:bg-white/5"}`
   }`;
 
 const groupLabel = "px-1 text-[10px] font-medium uppercase tracking-[0.2em] text-mist";
@@ -31,34 +27,18 @@ function toggle<T>(list: T[], item: T): T[] {
 }
 
 export function FilterControls({ query, onChange, idPrefix, layout }: FilterControlsProps) {
-  const groupClass =
-    layout === "row"
-      ? "flex flex-wrap items-center gap-1 rounded-xl border border-white/5 bg-ink/60 p-1"
-      : "flex flex-wrap items-center gap-1.5";
-
-  const parsePrice = (value: string) => (value === "" ? undefined : Number(value));
-
-  // Picking a min above the current max (or the reverse) clears the other side instead of
-  // producing an impossible range that the API would reject.
-  const setMinPrice = (value: string) => {
-    const minPrice = parsePrice(value);
-    const maxPrice = minPrice !== undefined && query.maxPrice !== undefined && query.maxPrice < minPrice ? undefined : query.maxPrice;
-    onChange({ minPrice, maxPrice });
-  };
-
-  const setMaxPrice = (value: string) => {
-    const maxPrice = parsePrice(value);
-    const minPrice = maxPrice !== undefined && query.minPrice !== undefined && query.minPrice > maxPrice ? undefined : query.minPrice;
-    onChange({ minPrice, maxPrice });
-  };
-
-  const priceLabelClass = layout === "row" ? "flex items-center gap-2" : "block space-y-1";
+  const row = layout === "row";
+  const groupClass = "flex flex-wrap items-center gap-1";
+  // On the desktop row "1 BHK" and "Apartment" explain themselves, so those labels are for screen
+  // readers only; the drawer shows them.
+  const selfExplanatoryLabel = row ? "sr-only" : groupLabel;
   const furnishedValue = query.furnished === undefined ? "any" : String(query.furnished);
+  const divider = row ? <span aria-hidden="true" className="h-5 w-px bg-white/10" /> : null;
 
   return (
-    <div className={layout === "row" ? "flex flex-wrap items-center gap-3" : "space-y-6"}>
+    <div className={row ? "flex flex-wrap items-center gap-4" : "space-y-6"}>
       <div role="group" aria-labelledby={`${idPrefix}-bhk`} className={groupClass}>
-        <span id={`${idPrefix}-bhk`} className={groupLabel}>BHK</span>
+        <span id={`${idPrefix}-bhk`} className={selfExplanatoryLabel}>BHK</span>
         {BHK_OPTIONS.map((bhk) => (
           <button
             key={bhk}
@@ -72,8 +52,10 @@ export function FilterControls({ query, onChange, idPrefix, layout }: FilterCont
         ))}
       </div>
 
+      {divider}
+
       <div role="group" aria-labelledby={`${idPrefix}-type`} className={groupClass}>
-        <span id={`${idPrefix}-type`} className={groupLabel}>Type</span>
+        <span id={`${idPrefix}-type`} className={selfExplanatoryLabel}>Type</span>
         {PROPERTY_TYPES.map((type: PropertyType) => (
           <button
             key={type}
@@ -87,34 +69,9 @@ export function FilterControls({ query, onChange, idPrefix, layout }: FilterCont
         ))}
       </div>
 
-      <div className={layout === "row" ? "flex items-center gap-2" : "grid grid-cols-2 gap-3"}>
-        <label className={priceLabelClass}>
-          <span className={groupLabel}>Min price</span>
-          <select
-            value={query.minPrice ?? ""}
-            onChange={(event) => setMinPrice(event.target.value)}
-            className="field min-h-9 cursor-pointer px-3 py-1.5 text-xs"
-          >
-            <option value="">No min</option>
-            {PRICE_STEPS.map((price) => (
-              <option key={price} value={price}>{formatPrice(price)}</option>
-            ))}
-          </select>
-        </label>
-        <label className={priceLabelClass}>
-          <span className={groupLabel}>Max price</span>
-          <select
-            value={query.maxPrice ?? ""}
-            onChange={(event) => setMaxPrice(event.target.value)}
-            className="field min-h-9 cursor-pointer px-3 py-1.5 text-xs"
-          >
-            {PRICE_STEPS.map((price) => (
-              <option key={price} value={price}>{formatPrice(price)}</option>
-            ))}
-            <option value="">No max</option>
-          </select>
-        </label>
-      </div>
+      {!row && <PriceRange query={query} onChange={onChange} idPrefix={idPrefix} />}
+
+      {divider}
 
       <fieldset className={groupClass}>
         <legend className="sr-only">Furnishing</legend>
