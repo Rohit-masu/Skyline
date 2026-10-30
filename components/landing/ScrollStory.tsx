@@ -43,7 +43,7 @@ export function ScrollStory() {
       <StoryScene
         id="arrival"
         heightVh={SCENE_HEIGHTS.arrival}
-        eyebrow="01 — Arrival"
+        eyebrow="Arrival"
         level="G · GROUND"
         still={{ src: "/posters/arrival.webp", alt: "Render of Skyline tower in the city at blue hour" }}
       >
@@ -59,7 +59,7 @@ export function ScrollStory() {
       <StoryScene
         id="build"
         heightVh={SCENE_HEIGHTS.build}
-        eyebrow="02 — The Making"
+        eyebrow="The making"
         level="L01 → L28"
         still={{ src: "/posters/build.webp", alt: "Render of the tower floors stacking into place" }}
       >
@@ -84,7 +84,7 @@ export function ScrollStory() {
       <StoryScene
         id="inside"
         heightVh={SCENE_HEIGHTS.inside}
-        eyebrow="03 — Inside a home"
+        eyebrow="Inside a home"
         level="L18 · SKY SUITE"
         still={{ src: "/posters/inside.webp", alt: "Render of the level 18 floor plan with the floors above lifted" }}
       >
@@ -110,7 +110,7 @@ export function ScrollStory() {
           key={amenity.id}
           id={amenity.id}
           heightVh={SCENE_HEIGHTS[amenity.id]}
-          eyebrow={`04 — Amenities · ${index + 1}/3`}
+          eyebrow={`Amenities · ${index + 1}/3`}
           level={amenity.level}
           still={amenity.still}
         >
@@ -124,7 +124,7 @@ export function ScrollStory() {
       <StoryScene
         id="cta"
         heightVh={SCENE_HEIGHTS.cta}
-        eyebrow="05 — Your view"
+        eyebrow="Your view"
         level="ROOF"
         still={{ src: "/posters/cta.webp", alt: "Render of Skyline tower at night" }}
       >

@@ -26,7 +26,6 @@ export function VisitInvitation() {
           <div className="space-y-10">
             <SectionHeading
               id="visit-title"
-              number="07"
               eyebrow="Visit the pavilion"
               title="Find the home that fits your view."
               accent={["view."]}

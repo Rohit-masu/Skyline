@@ -73,3 +73,5 @@ One line each: what — why — rejected alternative.
 - Bento rows have fixed heights (auto-rows) so the grid never shifts while images load (CLS).
 - "Open now" uses the visitor's clock in IST, read with useSyncExternalStore on the client only (prerendered page → no hydration mismatch).
 - Minimal pass after Rohit's review ("navbar, footer look crowded"; references: reeltor.com, vantooptics.vercel.app): header = wordmark + 4 links + one outline CTA, fixed 72 px height (no resize on scroll), no tagline; footer = one CTA line + 3 columns + legal line, marquee and the BHK link column removed (the listings filters already do that), watermark lighter.
+- Section numbers ("01 —" … "07 —") removed from every eyebrow (landing story, 06/07, detail page): the minimal pass keeps only the words; numbers added noise without helping navigation. The 404 label keeps its status code.
+- Story → Featured: no brass hairline at the seam (it read as a hard cut); a taller ink veil (24rem) fades the fixed 3D canvas out instead. Featured heading capped at text-5xl with the GSAP word reveal (data-split).

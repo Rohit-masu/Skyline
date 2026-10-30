@@ -24,7 +24,7 @@ export function PropertyFacts({ property }: { property: Property }) {
   return (
     <>
       <section aria-labelledby="facts-title" className="space-y-4">
-        <h2 id="facts-title" className={sectionTitle}>01 — Key facts</h2>
+        <h2 id="facts-title" className={sectionTitle}>Key facts</h2>
         <dl className="grid grid-cols-2 gap-3.5 sm:grid-cols-3">
           {keyFacts.map(({ icon: Icon, label, value }) => (
             <div key={label} className="space-y-1 rounded-2xl border border-white/5 bg-[#0e1624] p-4">
@@ -39,14 +39,14 @@ export function PropertyFacts({ property }: { property: Property }) {
       </section>
 
       <section aria-labelledby="about-title" className="space-y-4">
-        <h2 id="about-title" className={sectionTitle}>02 — About this home</h2>
+        <h2 id="about-title" className={sectionTitle}>About this home</h2>
         <p className="rounded-2xl border border-brass/15 bg-[#0e1624]/60 p-6 text-base font-light leading-relaxed text-ivory-dim sm:p-8">
           {property.description}
         </p>
       </section>
 
       <section aria-labelledby="specs-title" className="space-y-4">
-        <h2 id="specs-title" className={sectionTitle}>03 — Specifications</h2>
+        <h2 id="specs-title" className={sectionTitle}>Specifications</h2>
         <dl className="divide-y divide-white/5 overflow-hidden rounded-2xl border border-white/10 bg-[#0e1624]/80">
           {specifications.map(({ label, value }) => (
             <div key={label} className="flex flex-col justify-between gap-1 p-4 text-sm sm:flex-row sm:items-center sm:gap-6 sm:p-5">
@@ -58,7 +58,7 @@ export function PropertyFacts({ property }: { property: Property }) {
       </section>
 
       <section aria-labelledby="amenities-title" className="space-y-4">
-        <h2 id="amenities-title" className={sectionTitle}>04 — Amenities</h2>
+        <h2 id="amenities-title" className={sectionTitle}>Amenities</h2>
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {property.amenities.map((amenity) => (
             <li key={amenity} className="flex items-center gap-3 rounded-xl border border-white/5 bg-[#0e1624] p-3.5 text-sm text-ivory">

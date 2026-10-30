@@ -20,7 +20,7 @@ export function LocationBlock({ property }: { property: Property }) {
   return (
     <section aria-labelledby="location-title" className="space-y-4">
       <h2 id="location-title" className="text-xs uppercase tracking-[0.2em] text-brass">
-        05 — Location
+        Location
       </h2>
       <div className="space-y-5 rounded-2xl border border-brass/20 bg-[#0e1624]/60 p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">

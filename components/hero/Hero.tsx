@@ -65,7 +65,7 @@ export function Hero() {
           style={{ animationDelay: "150ms" }}
         >
           <span className="h-px w-8 bg-brass" aria-hidden="true" />
-          01 — A New Perspective
+          A new perspective
         </p>
 
         <h1

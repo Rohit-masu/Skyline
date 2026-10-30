@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { getFeaturedProperties, getPortfolioStats } from "@/lib/properties";
 import { TOTAL_FLOORS } from "@/lib/site";
+import { SplitWords } from "@/components/motion/SplitWords";
 import { FeaturedCard } from "./FeaturedCard";
 
 const FEATURED_COUNT = 6;
@@ -22,33 +23,33 @@ export function FeaturedHomes() {
         An extended multi-layered gradient veil and ambient radial bloom that dissolves 
         the fixed 3D canvas into the ink background with zero harsh cuts or static edges.
       */}
-      <div className="pointer-events-none absolute -top-40 sm:-top-56 inset-x-0 h-40 sm:h-56 bg-gradient-to-t from-ink via-ink/85 via-ink/30 to-transparent select-none" aria-hidden="true">
+      {/* Tall veil (no hairline, no hard edge): the 3D fades into ink over ~24rem of scroll. */}
+      <div className="pointer-events-none absolute -top-64 sm:-top-96 inset-x-0 h-64 sm:h-96 bg-gradient-to-t from-ink via-ink/70 to-transparent select-none" aria-hidden="true">
         {/* Soft golden twilight bloom radiating upward */}
         <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-4/5 max-w-5xl h-48 rounded-full bg-[radial-gradient(ellipse_at_bottom,_rgba(201,163,106,0.14)_0%,_rgba(28,37,51,0.08)_50%,_transparent_75%)] blur-3xl opacity-80" />
-      </div>
-
-      {/* GSAP-scrubbed hairline that elegantly draws across as user reaches this section */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-px overflow-hidden" aria-hidden="true">
-        <div data-draw-line className="h-full w-full bg-gradient-to-r from-transparent via-brass/40 to-transparent origin-left" />
       </div>
 
       <div className="section-inner space-y-12 sm:space-y-16">
         {/* Eyebrow */}
         <p data-reveal className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.35em] text-brass">
           <span aria-hidden="true" className="h-px w-10 bg-brass/60" />
-          06 — The Residence Collection
+          The residence collection
         </p>
 
         {/* 3-Column Editorial Masthead: Title | Intro | Inline Stats & CTA */}
         <div className="grid grid-cols-1 items-end gap-8 lg:grid-cols-12">
           {/* Column 1: Main Title */}
           <div className="lg:col-span-5">
+            {/* data-split: words slide up out of their masks when the heading scrolls in (GSAP layer). */}
             <h2
               id="featured-title"
-              className="font-display text-4xl font-light leading-[1.04] tracking-tight text-ivory sm:text-5xl lg:text-6xl"
+              data-split
+              className="font-display text-4xl font-light leading-[1.08] tracking-tight text-ivory sm:text-5xl"
             >
-              <span>A collection</span>
-              <span className="block text-brass italic font-normal">with a view.</span>
+              <SplitWords text="A collection" />
+              <span className="block">
+                <SplitWords text="with a view." accent={["with", "a", "view."]} />
+              </span>
             </h2>
           </div>
 

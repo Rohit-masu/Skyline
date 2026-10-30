@@ -27,6 +27,7 @@ export function createInteraction(floorGroups: Group[], hoverTargets: Object3D[]
   const parallax = new Vector2();
   const raycaster = new Raycaster();
   let pointerMoved = false;
+  let pointerOverStory = false;
   let pointerX = 0;
   let pointerY = 0;
 
@@ -42,6 +43,11 @@ export function createInteraction(floorGroups: Group[], hoverTargets: Object3D[]
     pointerX = event.clientX;
     pointerY = event.clientY;
     pointerMoved = true;
+    // The canvas is fixed behind the whole page, so the tower can sit under Featured homes or the
+    // header. Hover only counts over the story itself. Hiding here (not in the frame loop) also
+    // works after the loop has paused because the story scrolled away.
+    pointerOverStory = event.target instanceof Element && event.target.closest("[data-story-root]") !== null;
+    if (!pointerOverStory && highlight.visible) hideHover();
   }
 
   if (enabled) window.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -58,7 +64,7 @@ export function createInteraction(floorGroups: Group[], hoverTargets: Object3D[]
     parallax.x = MathUtils.damp(parallax.x, pointer.x * POINTER_PARALLAX.strength, POINTER_PARALLAX.damping, deltaSeconds);
     parallax.y = MathUtils.damp(parallax.y, pointer.y * POINTER_PARALLAX.strength, POINTER_PARALLAX.damping, deltaSeconds);
 
-    if (!hoverAllowed) {
+    if (!hoverAllowed || !pointerOverStory) {
       if (highlight.visible) hideHover();
       return parallax;
     }
