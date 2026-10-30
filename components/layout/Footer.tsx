@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowUp, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
+import { getCities } from "@/lib/properties";
 import { PAVILION, TOTAL_FLOORS, TOTAL_HOMES } from "@/lib/site";
 
 const COLUMNS = [
@@ -28,9 +29,42 @@ const COLUMNS = [
 // Shown on every page, so the motion is CSS only (scroll-driven, see .footer-reveal in
 // globals.css): no GSAP on listings/detail, and without support everything is simply visible.
 export function Footer() {
+  const cities = getCities();
+
   return (
     <footer className="relative z-10 overflow-hidden border-t border-brass/15 bg-ink-deep text-mist">
-      <div className="section-inner relative pb-10 pt-24">
+      {/* Endless outlined city names. Two identical lists, moved by exactly one list width. */}
+      <div aria-hidden="true" className="marquee-wrap overflow-hidden border-b border-white/5 py-8">
+        <div className="marquee flex w-max">
+          {[0, 1].map((copy) => (
+            <ul key={copy} className="flex shrink-0 items-center">
+              {cities.map((city) => (
+                <li key={city} className="flex items-center font-display text-5xl font-light uppercase sm:text-7xl">
+                  <span className="text-outline px-8 transition-colors duration-300 hover:text-brass">{city}</span>
+                  <span className="text-2xl text-brass">✦</span>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </div>
+
+      <div className="section-inner relative pb-10 pt-20">
+        <div className="footer-reveal mb-20 flex flex-col justify-between gap-10 lg:flex-row lg:items-end" style={{ "--i": 0 } as React.CSSProperties}>
+          <h2 className="max-w-3xl font-display text-5xl font-light leading-[1.02] tracking-tight text-ivory sm:text-7xl">
+            Let&apos;s find <span className="italic text-brass">your floor.</span>
+          </h2>
+          <Link
+            href="/properties"
+            className="group inline-flex items-center gap-4 self-start rounded-full border border-brass/40 py-3 pl-7 pr-3 text-xs uppercase tracking-widest text-ivory transition-colors duration-300 hover:border-brass hover:bg-brass hover:text-ink lg:self-auto"
+          >
+            Explore homes
+            <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-full bg-brass text-ink transition-transform duration-300 group-hover:rotate-45 group-hover:bg-ink group-hover:text-brass">
+              <ArrowUpRight className="h-5 w-5" />
+            </span>
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 gap-12 border-b border-white/5 pb-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div className="footer-reveal space-y-6" style={{ "--i": 0 } as React.CSSProperties}>
             <Link href="/" className="inline-flex items-center gap-2" aria-label="Skyline home">

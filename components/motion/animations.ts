@@ -72,6 +72,35 @@ export function startAnimations(): () => void {
       );
     });
 
+    // Image wipes up from the bottom while it settles from a slight zoom.
+    gsap.utils.toArray<HTMLElement>("[data-clip-reveal]").forEach((element) => {
+      gsap.fromTo(
+        element,
+        { clipPath: "inset(100% 0% 0% 0%)", scale: 1.15 },
+        {
+          clipPath: "inset(0% 0% 0% 0%)",
+          scale: 1,
+          duration: 1.4,
+          delay: Number(element.dataset.revealDelay ?? 0),
+          ease: "expo.out",
+          scrollTrigger: { trigger: element, start: "top 85%", once: true },
+        },
+      );
+    });
+
+    // A line that draws itself across its section as you scroll (scrubbed, reverses on the way up).
+    gsap.utils.toArray<HTMLElement>("[data-draw-line]").forEach((element) => {
+      gsap.fromTo(
+        element,
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          ease: "none",
+          scrollTrigger: { trigger: element, start: "top 85%", end: "top 45%", scrub: 0.6 },
+        },
+      );
+    });
+
     gsap.utils.toArray<HTMLElement>("[data-count]").forEach((element) => {
       const target = Number(element.dataset.count);
       const decimals = (element.dataset.count?.split(".")[1] ?? "").length;
@@ -89,6 +118,18 @@ export function startAnimations(): () => void {
   });
 
   if (finePointer) {
+    // Spotlight cards: the pointer position goes into --spot-x / --spot-y, CSS draws the glow
+    // (.spotlight in globals.css). Only CSS variables change, so there is no layout work.
+    gsap.utils.toArray<HTMLElement>("[data-spotlight]").forEach((element) => {
+      const onMove = (event: PointerEvent) => {
+        const box = element.getBoundingClientRect();
+        element.style.setProperty("--spot-x", `${event.clientX - box.left}px`);
+        element.style.setProperty("--spot-y", `${event.clientY - box.top}px`);
+      };
+      element.addEventListener("pointermove", onMove);
+      cleanups.push(() => element.removeEventListener("pointermove", onMove));
+    });
+
     gsap.utils.toArray<HTMLElement>("[data-magnetic]").forEach((element) => {
       const moveX = gsap.quickTo(element, "x", { duration: 0.5, ease: "power3.out" });
       const moveY = gsap.quickTo(element, "y", { duration: 0.5, ease: "power3.out" });

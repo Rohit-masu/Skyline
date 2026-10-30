@@ -3,6 +3,8 @@ export const PAVILION = {
   name: "Skyline Experience Pavilion",
   address: "Sector 128, Noida Expressway, Uttar Pradesh 201304",
   hours: "Every day, 10:00 – 19:00 IST",
+  opensAt: 10, // hour, IST
+  closesAt: 19,
   phone: "+91 98100 75463",
   phoneHref: "+919810075463",
   email: "visit@skyline-residences.in",

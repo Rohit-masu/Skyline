@@ -68,3 +68,16 @@ export function getSimilarProperties(current: Property, count = SIMILAR_COUNT): 
     })
     .slice(0, count);
 }
+
+/** Headline numbers for the landing (computed, so they never drift from the data). */
+export function getPortfolioStats() {
+  return {
+    homes: PROPERTIES_DATA.length,
+    cities: new Set(PROPERTIES_DATA.map((property) => property.city)).size,
+    lowestPrice: Math.min(...PROPERTIES_DATA.map((property) => property.price)),
+  };
+}
+
+export function getCities(): string[] {
+  return [...new Set(PROPERTIES_DATA.map((property) => property.city))];
+}

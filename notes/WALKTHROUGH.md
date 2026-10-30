@@ -82,3 +82,7 @@ Listings, detail, form and API files are not written up here yet; AGENTS.md §7�
 - `FeaturedHomes.tsx` (06) and `VisitInvitation.tsx` (07) — both use `.section-shell` + `.section-inner` from globals.css. Visit has a parallax photo and the pavilion card (`lib/site.ts`).
 - `components/layout/Footer.tsx` — real links only, contact from `lib/site.ts`; columns rise with `.footer-reveal` (CSS `animation-timeline: view()`, stagger via `--i`), watermark opens with `.footer-watermark`, links use `.link-underline`.
 - `components/ui/AltitudeRail.tsx` — second IntersectionObserver on `[data-story-root]` hides the rail after the story.
+- `FeaturedCard.tsx` — full-bleed card: `data-clip-reveal` (GSAP wipe), `data-spotlight` (pointer → `--spot-x/--spot-y`, glow drawn by `.spotlight` in CSS), outlined number (`.text-outline`), specs slide up on hover (`.featured-specs`, always visible on touch).
+- `FeaturedHomes.tsx` — stats band (`data-count`, numbers from `getPortfolioStats()`), bento grid via `TILE_CLASSES` (first tile 2×2).
+- `VisitBadge.tsx` (SVG textPath ring, `.spin-slow`), `VisitSteps.tsx` (`data-draw-line` scrubbed line), `OpenStatus.tsx` (IST hours from `lib/site.ts`, checked every minute).
+- Footer marquee: two copies of the city list (`getCities()`), `.marquee` moves by one list width; pauses on hover.

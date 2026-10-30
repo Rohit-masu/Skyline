@@ -218,6 +218,82 @@ body {
   }
 }
 
+/* ---------- Trendy details (own CSS, no component library) ---------- */
+
+/* Glow that follows the pointer: --spot-x/--spot-y are written by animations.ts (data-spotlight).
+   ::before is a soft light inside the card, ::after lights up the border under the pointer. */
+.spotlight::before,
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+.spotlight::before {
+  z-index: -1;
+  background: radial-gradient(420px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(223, 186, 130, 0.16), transparent 60%);
+}
+
+.spotlight::after {
+  padding: 1px;
+  background: radial-gradient(260px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(223, 186, 130, 0.9), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.spotlight:hover::before,
+.spotlight:hover::after {
+  opacity: 1;
+}
+
+/* Outlined display numbers (01–06) and the footer marquee. */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(223, 186, 130, 0.55);
+}
+
+/* Featured specs: hidden until hover on devices that can hover, always shown on touch. */
+@media (hover: hover) and (pointer: fine) {
+  .featured-specs {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: max-height 300ms ease-out, opacity 300ms ease-out, transform 300ms ease-out;
+  }
+
+  .group:hover .featured-specs,
+  .group:focus-within .featured-specs {
+    max-height: 4rem;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Circular "Book a visit" badge: the ring of text turns slowly, the arrow stays still. */
+.spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Endless outlined-city marquee in the footer (same technique as the hero ticker). */
+.marquee {
+  animation: ticker 40s linear infinite;
+}
+
+.marquee-wrap:hover .marquee {
+  animation-play-state: paused;
+}
+
 /* Hairline borders */
 .border-brass-hairline {
   border-color: rgba(201, 163, 106, 0.25);

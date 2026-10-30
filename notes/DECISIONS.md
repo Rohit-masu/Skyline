@@ -68,3 +68,7 @@ One line each: what — why — rejected alternative.
 - Footer motion is CSS scroll-driven (`.footer-reveal`, `--i` stagger, watermark) instead of GSAP: the footer is on every page and GSAP is only loaded on the landing; unsupported browsers and reduced motion simply show it.
 - Visit section now has the pavilion address/hours card, so the header's "Location" link (was `/#location`, a dead anchor) points to `/#visit`. Contact details live once in `lib/site.ts`.
 - Altitude rail fades out (and is `inert`) when the story root leaves the middle of the viewport — it overlapped the featured cards and the footer.
+- Featured/Visit/footer "trendy" pass (bento grid, spotlight cards, clip-path image reveals, count-up stats, rotating text badge, scroll-drawn steps line, live open/closed chip, outlined city marquee) built with our own CSS and the existing lazy GSAP layer — patterns seen on Awwwards/Framer/React Bits, but no component library code copied (plagiarism rule, Rohit must explain every line) and 0 KB added to any initial bundle except OpenStatus (a few hundred bytes).
+- Featured cards are one link each (title ::after covers the card) — the old card had two links to the same page, an extra tab stop per home.
+- Bento rows have fixed heights (auto-rows) so the grid never shifts while images load (CLS).
+- "Open now" uses the visitor's clock in IST, read with useSyncExternalStore on the client only (prerendered page → no hydration mismatch).
