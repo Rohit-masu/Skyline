@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 
 // Must match the scene ids in components/landing/ScrollStory.tsx (and Hero).
+// Displayed in top-down tower order (Floor 28 down to 01).
 const LEVELS = [
-  { id: "hero", label: "G", title: "Arrival" },
-  { id: "build", label: "L12", title: "The making" },
-  { id: "inside", label: "L18", title: "Inside a home" },
-  { id: "pool", label: "L04", title: "Podium pool" },
-  { id: "gym", label: "L24", title: "Sky gym" },
-  { id: "garden", label: "ROOF", title: "Roof garden" },
+  { id: "garden", label: "28", title: "Roof garden" },
+  { id: "gym", label: "24", title: "Sky gym" },
+  { id: "inside", label: "18", title: "Inside a home" },
+  { id: "pool", label: "12", title: "Podium pool" },
+  { id: "build", label: "06", title: "The making" },
+  { id: "hero", label: "01", title: "Arrival" },
 ];
 
 export function AltitudeRail() {
@@ -72,35 +73,34 @@ export function AltitudeRail() {
         aria-label="Tower altitude"
         inert={!inStory}
       >
-        <div className="flex flex-col items-center gap-5 rounded-full border border-brass/15 bg-ink/60 px-2.5 py-6 shadow-xl backdrop-blur-md">
-          <span className="text-[9px] uppercase tracking-[0.25em] text-mist [writing-mode:vertical-rl] rotate-180" aria-hidden="true">
-            Altitude
+        <div className="flex flex-col items-center gap-4 rounded-full border border-white/10 bg-ink/75 px-3 py-6 shadow-2xl backdrop-blur-md">
+          <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-mist/70" aria-hidden="true">
+            Floor
           </span>
-          <span className="h-8 w-px bg-gradient-to-b from-transparent to-brass/30" aria-hidden="true" />
-          <ol className="flex flex-col items-center gap-3">
+          <span className="h-3 w-px bg-white/10" aria-hidden="true" />
+          <ol className="flex flex-col items-center gap-4">
             {LEVELS.map((level) => {
               const isActive = activeLevel === level.id;
               return (
-                <li key={level.id}>
+                <li key={level.id} className="relative flex flex-col items-center justify-center">
                   <a
                     href={`#${level.id}`}
                     title={level.title}
                     aria-current={isActive ? "location" : undefined}
-                    className={`block rounded px-1.5 py-0.5 font-mono text-[10px] tracking-wider transition-all duration-300 ${
-                      isActive ? "scale-110 font-bold text-brass" : "text-mist hover:text-ivory"
+                    className={`block font-mono text-[11px] tracking-wider transition-all duration-300 ${
+                      isActive ? "font-semibold text-brass scale-110" : "text-mist/60 hover:text-ivory"
                     }`}
                   >
                     {level.label}
                     <span className="sr-only"> — {level.title}</span>
                   </a>
+                  {isActive && (
+                    <span className="mt-1 h-1 w-1 rounded-full bg-brass shadow-[0_0_6px_#c9a36a]" aria-hidden="true" />
+                  )}
                 </li>
               );
             })}
           </ol>
-          <span className="h-8 w-px bg-gradient-to-b from-brass/30 to-transparent" aria-hidden="true" />
-          <span className="font-mono text-[9px] font-semibold tabular-nums text-brass" aria-hidden="true">
-            {Math.round(scrollProgress * 28)}F
-          </span>
         </div>
       </nav>
     </>
