@@ -1,4 +1,4 @@
-﻿# Skyline — The Art of Elevated Living
+# Skyline — The Art of Elevated Living
 
 A luxury residential architectural showcase built for the **Reeltor** Frontend Developer evaluation.
 
@@ -32,7 +32,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Phase 1: Architectural Luxury Design System & Landing Shell
 - **Art Direction**: Deep charcoal canvas (`#0a0f18`), champagne brass accents (`#c9a36a`), warm ivory typography (`#f4eee5`), Fraunces serif headings, and Manrope sans body.
 - **Responsive Site Shell**: Header with altitude indicators, mobile slide-over navigation with background blur lock, and comprehensive footer with Reeltor Pavilion address.
-- **Cinematic Hero**: Immediate LCP paint with fixed-ratio high-res architectural render (`hero-tower.jpg`), live Asia/Kolkata (IST) clock, and real GPS coordinates.
+- **3D-first Hero**: The headline and a poster rendered from our own 3D scene (`public/posters/hero.webp`) paint first (LCP); the live 3D canvas then fades in on top showing the same view, so there is no change of style. Live Asia/Kolkata (IST) clock, letter-by-letter headline reveal, ticker.
 
 ### Phase 2: Property Data & API Layer
 - **56 Realistic Indian Residences**: Seeded with authentic INR pricing (`₹1.8 Cr` to `₹115 Cr`), realistic carpet areas (1,200 to 14,000 sq.ft), floor elevations, and detailed technical specifications across Delhi-NCR (Noida Expressway, Golf Course Road), Mumbai, Bengaluru, and Goa.
@@ -54,15 +54,17 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Private Viewing Enquiry Form**: 10-digit Indian mobile validation (`^[6-9]\d{9}$`), preferred date picker (next 90 days), duplicate submit protection, and **input retention on validation error**.
 - **Real 404**: Invalid slugs invoke `notFound()` and render a custom luxury 404 page.
 
-### Phase 5: Scroll-Driven 3D Story (Three.js)
-- **5 Distinct Scenes**:
-  1. *The Arrival*: Tower silhouette + smooth camera orbit tied to scroll progress.
-  2. *Vertical Assembly*: 28 post-tensioned floor slabs dynamically assemble with scroll and reverse smoothly on upward scroll.
-  3. *Interior Reveal*: Camera zooms into Level 18 Sky Suite to reveal floor layout, 11-ft clear height, and marble specifications.
-  4. *Vertical Club*: Level 04 cantilevered infinity pool, Level 24 sky gym, and Level 28 crown firepit.
-  5. *The Invitation*: Wide twilight panorama settling on a clear CTA to `/properties`.
-- **Interactive Parallax**: Mouse / touch tilt coordinates provide interactive depth beyond scrolling.
-- **Fallbacks**: `prefers-reduced-motion` renders an accessible static editorial layout; `IntersectionObserver` halts Three.js rendering when off-screen.
+### Phase 5: Scroll-Driven 3D Story (Three.js + GSAP)
+- **Scenes** (scroll position drives the camera and the model; nothing runs on a timer):
+  1. *Arrival*: the tower at blue hour in a lit city, camera orbiting with scroll; the manifesto lights up word by word.
+  2. *The making*: the floors pull apart, then drop back into place one by one; scrolling up reverses it. Floor and residence counters follow the same progress.
+  3. *Inside a home*: the floors above level 18 lift away like a dollhouse, the facade slides out and the 3 BHK plan appears with Living / Bedroom / Kitchen / Balcony labels pinned to 3D points.
+  4. *Amenities*: three camera stops: podium infinity pool (L04), open-air gym terrace (L24), roof garden; each stop has a story panel plus a card pinned to the 3D model.
+  5. *Call to action*: wide night shot of the whole tower and an "Explore homes" button to `/properties`.
+- **Look**: blue-hour to night lighting blended by scroll, RoomEnvironment reflections, soft shadows and bloom on the high tier, procedural city with lit windows, warm gold facade and a lit crown.
+- **Interaction**: damped pointer parallax and floor hover highlight with a "Floor 18 · 4 BHK" tooltip (desktop).
+- **DOM motion (GSAP + ScrollTrigger, lazy)**: word reveals, manifesto scrub, parallax, magnetic buttons, counters.
+- **Fallbacks**: reduced motion, Save-Data, no WebGL2 or a lost WebGL context → static story with renders of the same scene (`public/posters/*.webp`). The canvas stops rendering when the story is off-screen or the tab is hidden.
 
 ---
 
@@ -71,7 +73,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Framework**: Next.js 16.4.3 (App Router with Turbopack)
 - **Runtime & UI**: React 19.3.0, TypeScript 5
 - **Styling**: Tailwind CSS v4, Vanilla CSS Custom Properties
-- **3D Engine**: Three.js (`three` v0.186.1) with procedural geometry
+- **3D Engine**: Three.js (`three` v0.186.1), vanilla, procedural geometry, postprocessing bloom (high tier)
+- **DOM animation**: GSAP 3.13 + ScrollTrigger, loaded lazily on the landing only
 - **Validation**: Zod v4 (`zod` v4.6.7)
 - **Testing**: Vitest v5 (`vitest` v5.0.5)
 - **Icons**: Lucide React (`lucide-react` v1.64.0)
@@ -80,10 +83,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 4. 3D Loading & Performance Strategy
 
-1. **Zero LCP Impact**: The Hero section uses a native Next.js `<Image priority>` with high-contrast editorial gradients. Three.js is **NOT** loaded in the initial critical bundle.
-2. **Dynamic Lazy-Loading**: `TowerCanvas.tsx` is loaded with `next/dynamic` (`ssr: false`), keeping the initial JS bundle under 85 KB gzipped.
-3. **Procedural Geometry (< 2MB budget)**: Rather than requiring a heavy 15MB+ external GLTF download, the 28-storey tower is built procedurally using shared Three.js geometries and materials.
-4. **Thermal Throttling Protection**: Pixel ratio is strictly capped at `Math.min(window.devicePixelRatio, 1.75)` to prevent smartphone overheating.
+1. **Poster first**: the hero paints a real `<h1>` and a `next/image` poster (`priority`) before any WebGL code downloads. The poster is a still of our own 3D scene, captured by `scripts/capture-posters.mjs` and converted to WebP by `scripts/make-posters.ts`, so the live canvas fading in on top does not change the picture.
+2. **Lazy 3D chunk**: `components/landing/SceneLoader.tsx` imports `@/three/boot` only after first paint, on `requestIdleCallback` (1.2 s timeout fallback). Measured: three + scene code is one lazy chunk of ~146 KB gzipped (budget 200 KB). GSAP is a separate lazy chunk (~44 KB gzipped). Neither is in any route's initial bundle.
+3. **No downloaded 3D assets**: the tower, city, interior and amenities are procedural; every texture is drawn on a canvas at runtime and reflections come from `RoomEnvironment`. Nothing to compress with Draco/Meshopt or KTX2, and 0 bytes of models/textures over the wire. The only landing images are the WebP posters (~1 MB for all eight, served as AVIF/WebP at the right width by `next/image`).
+4. **Quality tiers**: high (desktop): DPR ≤ 2, soft shadows, bloom, 220 city blocks. Low (touch device or ≤ 4 cores): DPR ≤ 1.5, no shadows, no bloom, 110 blocks.
+5. **One smooth progress value**: scroll is damped (`MathUtils.damp`) into a single 0..1 progress; every visual and every text panel (`--scene-p` CSS variable) is a pure function of it, so fast scrolling and reversing never jump and overlays stay in sync.
+6. **Known gap**: first-load JS is about 192 KB gzipped on `/` and 195 KB on `/properties`, above the 130/120 KB budgets. The shared React + Next.js runtime chunks are ~158 KB of that on their own; see `notes/AI_LOG.md`.
 
 ---
 
@@ -111,4 +116,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Architectural Photography**: Unsplash License (high-resolution modern luxury residential architecture, interior living spaces, cantilevered infinity pools, and rooftop lounges).
 - **Typography**: Google Fonts — Fraunces (Display Serif) & Manrope (Body Sans).
 - **Icons**: Lucide React (ISC License).
+- **3D renders**: `public/posters/*.webp` are renders of this project's own procedural three.js scene (no third-party models).
+- **Animation**: GSAP (free standard licence).
 - **Concept & Branding**: Designed specifically for the **Reeltor** Frontend Developer Evaluation.

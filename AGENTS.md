@@ -2,7 +2,7 @@
 
 This file is the single source of truth for building this project. Read it fully before writing code, and re-read the relevant section before each milestone.
 
-> **Current phase: V1.** The landing page is built as a static storytelling page per `LANDING_V1_PLAN.md`. That file replaces §8.1, §8.2 and milestones M5–M6 for now. Do not write three.js code until Rohit starts V2. Everything else here still applies.
+> **Current phase: V2 (3D landing).** The landing is the scroll-driven three.js story in `three/` (§8.2), with GSAP only for DOM motion in its own lazy chunk. The hero paints a poster rendered from our own 3D scene (`npm run posters:capture` then `npm run posters`), so poster and live 3D look identical. `LANDING_V1_PLAN.md` is kept for its art direction only. The full assignment brief is in `docs/BRIEF.md`. Everything else here still applies.
 
 ---
 
