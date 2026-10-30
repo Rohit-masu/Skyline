@@ -2,7 +2,7 @@ import { ExternalLink, MapPin } from "lucide-react";
 import type { Property } from "@/types/property";
 import { MapEmbed } from "./MapEmbed";
 
-// A few well-known places per city; the seed data has no per-home landmarks (see DECISIONS.md).
+// A few well-known places per city; the seed data has no per-home landmarks (README → Assumptions).
 const NEARBY_LANDMARKS: Record<string, string[]> = {
   Gurgaon: ["Cyber Hub", "Golf Course Road metro", "Ambience Mall", "IGI Airport (25 min)"],
   Delhi: ["Khan Market", "Lodhi Garden", "India Gate", "IGI Airport (30 min)"],

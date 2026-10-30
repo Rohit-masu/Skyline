@@ -53,3 +53,6 @@ docs/BRIEF.md
 # raw 3D captures (converted into public/posters)
 /.posters-raw/
 /.next-prod/
+
+# Local working notes (agent instructions, decisions, walkthrough); not part of the submission
+.local-notes/

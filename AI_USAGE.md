@@ -1,59 +1,41 @@
-﻿# AI Usage Disclosure
+﻿# AI usage
 
-This document provides transparent disclosure regarding AI assistance utilized during the development of **Skyline** for the Reeltor Frontend Developer assignment.
+I used AI tools throughout this project. Below is how I used them, what went wrong and how I fixed it.
 
----
+## How the project was built, step by step
 
-## 1. Tools & Roles
+1. **Research (no AI).** I studied real-estate and 3D scroll sites on Awwwards, Framer and Dribbble, plus the Reeltor site, to decide on the look: dark, minimal and luxurious, with brass accents.
+2. **ChatGPT: theme and planning.** I gave ChatGPT the brief and my references. It helped me fix the theme (colours, two fonts, tone) and write the planning markdown files: requirements, folder structure and a task plan. From that I built a first prototype layout.
+3. **Gemini (Antigravity IDE): first static website.** Gemini built the first working version: design system, data seed, API routes, listings, detail page and enquiry form.
+4. **Claude Code: the 3D story.** Claude built the scroll-driven three.js tower (arrival, build-up, inside a home, amenities, call to action), the poster-first loading and the static fallbacks.
+5. **New session: art direction change.** A later session moved the 3D to a blue-hour/night look. The brief did not ask for it. I kept it because it matched the brass palette, and changing it again would have meant re-rendering all the posters.
+6. **Stability and backend pass (Claude Code).** Claude compared the listings, detail page and form against the brief and fixed the gaps it found. It also moved enquiries and the rate limit into Neon Postgres.
+7. **Transitions, polish and final brush (Gemini and Claude).** We added the section transitions, the editorial featured grid, the minimal navbar and footer, the intro screen and lighter images. I reviewed every change in the browser from screenshots.
 
-- **Gemini (via Google Antigravity IDE)**:
-  - Acted as an autonomous pair-programmer for iterative phase implementation (Phases 1 through 7).
-  - Drafted TypeScript interfaces, Zod schemas, React components, and Vitest test suites.
-  - Executed builds, type-checks, and automated tests directly in WSL/PowerShell.
+## Prompts that worked well
 
----
+These are paraphrased; the original prompts were a mix of Hindi and English.
 
-## 2. Prompts Used During Development
+1. *"Read the docs first and understand the scope, then finish the pending tasks. Ask me if anything is unclear."* Starting from the written plan stopped the AI from rebuilding things that already worked. It also asked me the real decisions: deploy, database, git flow and scope.
+2. *"Compare the listings page, detail page and enquiry form against the brief's stability checklist and fix what fails."* This found that the listings page did not render results on the server and had no guard against stale responses. It also found that invalid API parameters returned 200 instead of 400, and that the form had no accessible errors or double-submit guard.
+3. *"Use reeltor.com and my earlier project vantooptics.vercel.app as references. Keep it minimal and luxurious, and go section by section, easiest first."* Giving concrete references and a fixed order produced small, reviewable changes instead of one big redesign.
 
-1. **API & Data Layer (Phase 2)**:
-   > "Audit the existing data and API against Phase 2. Ensure query validation, status codes, at least 50 realistic Indian listings with authentic INR pricing, similar properties endpoint, and rate-limited enquiries with honeypot spam protection."
-2. **Listings URL State (Phase 3)**:
-   > "Implement the /properties listings page where URL query params are the single source of truth for search, filters, sort, and pagination. Ensure 12 items per page, race-condition cancellation via AbortController, and loading/empty/error states."
-3. **Detail & Lead Capture (Phase 4)**:
-   > "Implement server-rendered property details with per-property metadata, real 404 for unknown slugs, accessible keyboard gallery, and enquiry form with Indian mobile validation and input retention on failure."
-4. **Scroll-Driven 3D Story & Reeltor Customization (Phase 5)**:
-   > "Implement the 5-scene 3D tower story using procedural Three.js geometry, lazy-loading, and pointer parallax. Customize location and experience pavilion to Sector 128, Noida Expressway for Reeltor."
+## Where the AI was wrong, and how I caught it
 
----
+- **Build broken by a casing bug.** During the UI pass Gemini compared `property.type === "penthouse"`, but the type is `"Penthouse"`. The penthouse tag could never show, and `next build` failed type-checking. I caught it by running `npm run typecheck` before merging to `main`, and fixed the casing.
+- **A "real 404" that returned 200.** Unknown property URLs showed the 404 page but with status 200. With Next.js 16 `cacheComponents`, the page shell is streamed before `notFound()` runs. I checked the status with `curl`. The first two AI fixes failed: `dynamicParams` is not allowed with `cacheComponents`, and `"use cache"` alone did not help. The final fix rewrites unknown slugs in `proxy.ts` so Next renders the 404 page with a 404 status.
+- **Footer animations that never ran.** `overflow: hidden` turns an element into a scroll container, so the CSS scroll timeline tracked the footer instead of the page. I found it by reading the computed transform at different scroll positions; it never changed. The fix was `overflow: clip`.
+- **A tooltip stuck over the page.** The 3D floor-hover tooltip stayed on screen over the featured homes after the 3D loop paused. I spotted it in a screenshot. Hover now only counts over the story, and the tooltip hides from the pointer event itself.
 
-## 3. Real AI Mistakes Caught & Corrected
+## Limitations I worked within
 
-### Mistake 1: Client Component `new Date()` in Static Prerender
-- **What happened**: In `components/property/EnquiryForm.tsx`, `getKolkataDateString(0)` was called during component initialization at module evaluation time.
-- **How it was caught**: Next.js 16 (Turbopack) build failed with: `Next.js encountered the unstable value new Date() in a Client Component during prerender`.
-- **Correction**: Deferred dynamic live date evaluation to `useEffect` after client hydration, using static constant fallback limits during static prerender.
-- **Lesson**: Next.js 16 enforces strict purity during static prerendering; dynamic time reads in Client Components must always be hydrated via effects.
+- **Time:** 24 hours for a project of this size.
+- **New stack:** Next.js 16 (App Router, `cacheComponents`), GSAP and three.js were new to me. That is why I kept the architecture simple and explicit, so I can explain every file.
+- **3D models:** detailed GLB models would not fit the 2 MB asset budget, and I could not produce them in the time. The tower, interior, amenities and city are built procedurally in code instead, with 0 bytes of models downloaded.
+- **Resources:** I used free tiers only (Vercel, Neon), with no paid templates or assets.
 
-### Mistake 2: Raw Unicode Rupee Symbol in PowerShell / Bash Here-String
-- **What happened**: Passing raw `₹` character through shell string concatenation created UTF-8 replacement byte errors.
-- **How it was caught**: `npm run typecheck` threw `Invalid character TS1127`.
-- **Correction**: Replaced raw string literal with standardized Unicode escape `\u20B9` in `lib/format.ts`.
-- **Lesson**: Shell-agnostic Unicode escapes prevent encoding corruption across Windows / WSL boundaries.
+## What I checked myself
 
-### Mistake 3: Vitest Path Alias Resolution
-- **What happened**: Vitest could not resolve `@/*` path aliases defined in `tsconfig.json`.
-- **How it was caught**: Running `npm test` produced `Cannot find package '@/lib/format'`.
-- **Correction**: Configured `vitest.config.ts` with explicit `resolve.alias` mapping `@` to the project root.
-- **Lesson**: Test runners with independent Vite resolution require explicit alias alignment with `tsconfig.json`.
-
----
-
-## 4. Human Verification & Oversight
-
-- **Code Review**: Every component, schema, and API route was inspected for type safety, security (IP salting, rate limiting, honeypot), and accessibility (`aria-` attributes, keyboard navigation).
-- **Commands Verified**:
-  - `npm run typecheck` (`tsc --noEmit`) — 0 errors.
-  - `npm test` (`vitest run`) — 16/16 tests passing.
-  - `NEXT_DIST_DIR=.next-prod npm run build` — 100% successful compile of all 63 static & dynamic routes.
-  - `curl / Invoke-RestMethod` tests on valid and invalid API requests.
-- **Brand Alignment**: Verified that Noida Expressway (Sector 128) and Reeltor Experience Pavilion branding are accurately presented across the site.
+- Every change was checked with `npm run typecheck`, `npm run lint`, `npm test` and `npm run build`.
+- The listings and detail behaviour was checked with scripted browser runs: filters, fast typing, the Back button, scroll restore, the form, the 429 response and the 404 status.
+- The deployed site was checked with `curl` for status codes, CDN caching and a real enquiry saved to the database.

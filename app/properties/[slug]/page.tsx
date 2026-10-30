@@ -20,7 +20,7 @@ interface PageProps {
 
 // Every seeded home is rendered at build time. "use cache" + cacheLife("hours") is the cacheComponents
 // version of `revalidate = 3600`. Because the whole page is cached, an unknown slug renders in one
-// blocking pass and notFound() can still send a real 404 status (see DECISIONS.md).
+// blocking pass and notFound() can still send a real 404 status (README → Caching).
 export function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
 }
