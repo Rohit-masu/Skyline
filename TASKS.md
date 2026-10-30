@@ -28,7 +28,7 @@ Commands: `npm run dev` · `npm run typecheck` · `npm run lint` · `npm test` �
 
 ## Pending
 
-1. **Deploy to Vercel** (skipped for now by Rohit) with `DATABASE_URL`, `IP_HASH_SALT`, `ADMIN_PASSWORD`, `NEXT_PUBLIC_SITE_URL`. Run `npm run db:setup` once against the production database.
+1. ~~Deploy~~ Done: https://skyline-rho-seven.vercel.app (auto-deploys from main). Verified on production: all routes, 404 status, API 400s, CDN cache HIT, enquiry saved to Neon (201).
 2. **First-load JS over budget** (~190 KB gz vs 130/120); React DOM + Next runtime are most of it. Measure with `npm run analyze`.
 3. **Reports in `/reports`**: Lighthouse mobile on the deployed site + bundle analyzer.
 4. **UI polish**: Featured (06), Visit (07) and footer done (shared heading, one container, scroll animations). Left: mobile header tagline wraps to two lines.
