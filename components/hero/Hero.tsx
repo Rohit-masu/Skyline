@@ -3,159 +3,122 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, ChevronDown, Compass, Clock } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Clock, Compass } from "lucide-react";
+import { HeroSpotlight } from "./HeroSpotlight";
 
+const TICKER = ["28 Floors", "112 Residences", "Sky gardens", "Podium infinity pool", "Open-air sky gym", "Roof garden", "Noida Expressway"];
+
+// One headline line, split into letters that rise out of a mask on load (CSS only).
+// Screen readers read the h1's sr-only copy; the animated letters are aria-hidden.
+function RisingLine({ text, startMs }: { text: string; startMs: number }) {
+  return (
+    <span className="block overflow-hidden pb-[0.08em]" aria-hidden="true">
+      {text.split("").map((letter, index) => (
+        <span key={index} className="hero-char" style={{ animationDelay: `${startMs + index * 45}ms` }}>
+          {letter === " " ? " " : letter}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// S1 Arrival. The poster is a still rendered from our own 3D scene at the hero camera
+// (scripts/capture-posters.mjs), so when the live canvas fades in above it (z-[1]) the picture
+// does not change style, it starts moving. Poster + h1 paint before any WebGL code downloads.
+// Layers: poster z-0 < 3D canvas z-[1] < shade z-[2] < text z-10. No z-index on the section.
 export function Hero() {
   const [istTime, setIstTime] = useState<string>("");
 
+  // Clock is rendered only after mount, so server (UTC) and browser (IST) HTML never mismatch.
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const options: Intl.DateTimeFormatOptions = {
-        timeZone: "Asia/Kolkata",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      };
-      setIstTime(new Intl.DateTimeFormat("en-GB", options).format(now));
-    };
-
+    const formatter = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false });
+    const updateTime = () => setIstTime(formatter.format(new Date()));
     updateTime();
-    const interval = setInterval(updateTime, 1000);
+    const interval = setInterval(updateTime, 15_000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <section
-      id="arrival"
-      className="relative min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden pt-28 pb-10"
-      aria-label="Arrival Hero Section"
-    >
-      {/* Background Architectural Tower Image with Cinematic Overlays */}
+    <section id="hero" data-scene="hero" className="relative flex min-h-[100svh] flex-col overflow-hidden pt-24" aria-labelledby="hero-title">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/landing/hero-tower.jpg"
-          alt="Skyline - Slender 28-storey architectural residential tower illuminated at twilight"
+          src="/posters/hero.webp"
+          alt="Skyline tower at blue hour, rendered from the 3D model"
           fill
           priority
-          sizes="(max-aspect-ratio: 16/9) 178vh, 100vw"
-          className="object-cover object-center scale-105 transform motion-safe:transition-transform motion-safe:duration-1000"
+          sizes="100vw"
+          className="object-cover"
         />
-
-        {/* Cinematic Vignette & Gradients for High Readability and Mood */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-[#0a0f18]/65 to-[#0a0f18]/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f18]/90 via-[#0a0f18]/50 to-transparent" />
-        <div className="absolute inset-0 bg-grain opacity-40 pointer-events-none" />
       </div>
 
-      {/* Giant Architectural Wordmark Watermark */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 select-none pointer-events-none w-full text-center overflow-hidden"
-        aria-hidden="true"
-      >
-        <span className="font-display text-[15vw] leading-none font-bold tracking-[0.2em] text-white/[0.03] uppercase whitespace-nowrap">
-          SKYLINE
+      <div className="pointer-events-none absolute inset-0 z-[2]" aria-hidden="true">
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-ink/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
+      </div>
+      <HeroSpotlight />
+
+      <div className="hero-fade relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-4 pt-4 font-mono text-[11px] tracking-wider text-mist sm:px-8 lg:px-12">
+        <span className="flex items-center gap-2">
+          <Compass className="h-3.5 w-3.5 text-brass" aria-hidden="true" />
+          28.5355° N, 77.3910° E
+          <span className="hidden text-ivory/70 md:inline">· SECTOR 128, NOIDA EXPRESSWAY</span>
+        </span>
+        <span className="hidden items-center gap-2 sm:flex">
+          <Clock className="h-3.5 w-3.5 text-brass" aria-hidden="true" />
+          {istTime ? `${istTime} IST · Blue hour` : "IST"}
         </span>
       </div>
 
-      {/* Top Meta Bar (Live Coordinates & IST Clock) */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-12 flex items-center justify-between text-xs text-[#8f9ba8] font-mono tracking-wider pt-2">
-        <div className="flex items-center gap-2">
-          <Compass className="w-3.5 h-3.5 text-[#c9a36a]" />
-          <span>28.5355° N, 77.3910° E</span>
-          <span className="text-[rgba(201,163,106,0.3)]">·</span>
-          <span className="text-[#f4eee5]/80">SECTOR 128, NOIDA EXPRESSWAY · REELTOR</span>
-        </div>
+      <div className="relative z-10 mx-auto mt-auto w-full max-w-7xl px-4 pb-10 sm:px-8 lg:px-12">
+        <p className="hero-fade mb-6 flex items-center gap-4 text-[11px] font-medium uppercase tracking-[0.35em] text-brass" style={{ animationDelay: "150ms" }}>
+          <span className="h-px w-12 bg-brass" aria-hidden="true" />
+          Skyline Residences · 01 — Arrival
+        </p>
 
-        <div className="hidden sm:flex items-center gap-2">
-          <Clock className="w-3.5 h-3.5 text-[#c9a36a]" />
-          <span>{istTime ? `${istTime} IST` : "LIVE IST"}</span>
-          <span className="h-2 w-2 rounded-full bg-emerald-500/80 inline-block animate-ping ml-1" />
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-12 py-12 lg:py-16 flex flex-col justify-center">
-        <div className="max-w-3xl space-y-6">
-          {/* Eyebrow */}
-          <div className="inline-flex items-center gap-3">
-            <span className="h-[1px] w-8 bg-[#c9a36a]" />
-            <span className="text-[11px] uppercase tracking-[0.3em] text-[#c9a36a] font-sans font-medium">
-              01 —— ARRIVAL · LUXURY LIVING REDEFINED
+        <h1 id="hero-title" className="font-display text-[clamp(3.2rem,8.5vw,8.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
+          <span className="sr-only">Living above the city.</span>
+          <span className="flex flex-wrap gap-x-[0.25em]">
+            <RisingLine text="Living" startMs={250} />
+            {/* "above" rises as one word so its shimmer (background-clip: text) keeps working. */}
+            <span className="block overflow-hidden pb-[0.08em]" aria-hidden="true">
+              <span className="hero-char" style={{ animationDelay: "520ms" }}>
+                <span className="text-shimmer italic">above</span>
+              </span>
             </span>
-          </div>
+          </span>
+          <RisingLine text="the city." startMs={780} />
+        </h1>
 
-          {/* Editorial Headline */}
-          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-light text-[#f4eee5] tracking-tight leading-[1.08]">
-            Living <span className="italic text-[#c9a36a] font-normal">above</span> the city.
-          </h1>
-
-          {/* Subtext */}
-          <p className="text-base sm:text-lg text-[#8f9ba8] max-w-xl font-sans font-light leading-relaxed">
-            Skyline is a landmark 28-storey residential tower where private sky gardens, 
-            cantilevered infinity pools, and panoramic glass vistas redefine the standard of elevated living.
-          </p>
-
-          {/* Action CTAs */}
-          <div className="pt-4 flex flex-wrap items-center gap-4 sm:gap-6">
-            <Link
-              href="/properties"
-              className="btn-brass px-7 py-3.5 rounded-full text-xs uppercase tracking-widest flex items-center gap-3 group"
-            >
-              <span>Explore Residences</span>
-              <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </Link>
-
-            <a
-              href="#story"
-              className="btn-outline-brass px-6 py-3.5 rounded-full text-xs uppercase tracking-widest flex items-center gap-2"
-            >
-              <span>The Ascent Story</span>
-              <ChevronDown className="w-4 h-4 text-[#c9a36a]" />
-            </a>
-          </div>
+        <p className="hero-fade mt-8 max-w-md text-base font-light leading-relaxed text-ivory/80 sm:text-lg" style={{ animationDelay: "1100ms" }}>
+          Twenty-eight floors of glass and warm light above Noida Expressway. Scroll to watch the tower rise, step inside a
+          home and visit the pool, the sky gym and the roof garden.
+        </p>
+        <div className="hero-fade mt-8 flex flex-wrap items-center gap-4" style={{ animationDelay: "1250ms" }}>
+          <Link href="/properties" data-magnetic className="btn-brass group flex items-center gap-3 rounded-full px-8 py-4 text-xs uppercase tracking-widest">
+            Explore residences
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+          </Link>
+          <a href="#arrival" className="btn-outline-brass flex items-center gap-2 rounded-full px-6 py-4 text-xs uppercase tracking-widest">
+            Rise through the tower
+            <ChevronDown className="scroll-nudge h-4 w-4 text-brass" aria-hidden="true" />
+          </a>
         </div>
       </div>
 
-      {/* Bottom Architectural Stats Bar */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-12">
-        <div className="border-t border-[rgba(201,163,106,0.18)] pt-6 pb-2 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-          <div>
-            <span className="block font-display text-2xl sm:text-3xl text-[#f4eee5] font-light">
-              28 <span className="text-[#c9a36a] text-lg font-normal">Floors</span>
-            </span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#8f9ba8] font-sans">
-              Iconic Slender Silhouette
-            </span>
-          </div>
-
-          <div>
-            <span className="block font-display text-2xl sm:text-3xl text-[#f4eee5] font-light">
-              112 <span className="text-[#c9a36a] text-lg font-normal">Homes</span>
-            </span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#8f9ba8] font-sans">
-              2, 3 & 4 BHK + Penthouses
-            </span>
-          </div>
-
-          <div>
-            <span className="block font-display text-2xl sm:text-3xl text-[#f4eee5] font-light">
-              1.2 <span className="text-[#c9a36a] text-lg font-normal">Acres</span>
-            </span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#8f9ba8] font-sans">
-              Sky Gardens & Infinity Deck
-            </span>
-          </div>
-
-          <div>
-            <span className="block font-display text-2xl sm:text-3xl text-[#f4eee5] font-light">
-              ₹2.4 <span className="text-[#c9a36a] text-lg font-normal">Cr+</span>
-            </span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#8f9ba8] font-sans">
-              Private Tour By Invitation
-            </span>
-          </div>
+      {/* Endless ticker. The first copy is read by screen readers, the duplicate is decorative. */}
+      <div className="hero-fade relative z-10 overflow-hidden border-y border-brass/15 bg-ink/40 py-4 backdrop-blur-sm" style={{ animationDelay: "1400ms" }}>
+        <div className="ticker flex w-max">
+          {[0, 1].map((copy) => (
+            <ul key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1 ? "true" : undefined}>
+              {TICKER.map((item) => (
+                <li key={item} className="flex items-center gap-10 pr-10 font-display text-lg font-light uppercase tracking-[0.2em] text-ivory/70 sm:text-xl">
+                  {item}
+                  <span className="h-1.5 w-1.5 rotate-45 bg-brass" aria-hidden="true" />
+                </li>
+              ))}
+            </ul>
+          ))}
         </div>
       </div>
     </section>

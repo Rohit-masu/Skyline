@@ -2,101 +2,95 @@
 
 import { useEffect, useState } from "react";
 
+// Must match the scene ids in components/landing/ScrollStory.tsx (and Hero).
 const LEVELS = [
-  { id: "arrival", label: "G", title: "Street Arrival" },
-  { id: "amenities", label: "L04", title: "Infinity Podium" },
-  { id: "floorplans", label: "L18", title: "Sky Residences" },
-  { id: "wellness", label: "L24", title: "Sky Gym & Spa" },
-  { id: "featured", label: "L28", title: "Crown Penthouses" },
-  { id: "cta", label: "ROOF", title: "Sky Lounge" },
+  { id: "hero", label: "G", title: "Arrival" },
+  { id: "build", label: "L12", title: "The making" },
+  { id: "inside", label: "L18", title: "Inside a home" },
+  { id: "pool", label: "L04", title: "Podium pool" },
+  { id: "gym", label: "L24", title: "Sky gym" },
+  { id: "garden", label: "ROOF", title: "Roof garden" },
 ];
 
 export function AltitudeRail() {
-  const [activeLevel, setActiveLevel] = useState("arrival");
+  const [activeLevel, setActiveLevel] = useState("hero");
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
+    let frame = 0;
+    // Read scroll at most once per frame, not on every scroll event.
     const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScroll > 0) {
-        const progress = Math.min(Math.max(window.scrollY / totalScroll, 0), 1);
-        setScrollProgress(progress);
-
-        // Map scroll fraction to nearest level
-        const index = Math.min(
-          Math.floor(progress * LEVELS.length),
-          LEVELS.length - 1
-        );
-        const level = LEVELS[index];
-        if (level) {
-          setActiveLevel(level.id);
-        }
-      }
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+        setScrollProgress(totalScroll > 0 ? Math.min(Math.max(window.scrollY / totalScroll, 0), 1) : 0);
+      });
     };
+
+    // A scene counts as active while it crosses the middle line of the viewport.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveLevel(entry.target.id);
+        }
+      },
+      { rootMargin: "-50% 0px -50% 0px" },
+    );
+    for (const level of LEVELS) {
+      const section = document.getElementById(level.id);
+      if (section) observer.observe(section);
+    }
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
     <>
-      {/* Mobile Top Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 h-[2px] bg-transparent z-50 md:hidden pointer-events-none">
-        <div
-          className="h-full bg-gradient-to-r from-[#c9a36a] to-[#dfba82] transition-all duration-150"
-          style={{ width: `${scrollProgress * 100}%` }}
-        />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[2px] md:hidden" aria-hidden="true">
+        <div className="h-full origin-left bg-gradient-to-r from-brass to-brass-light" style={{ transform: `scaleX(${scrollProgress})` }} />
       </div>
 
-      {/* Desktop Right Rail */}
-      <aside
-        className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center pointer-events-none"
-        aria-label="Tower altitude indicator"
+      <nav
+        className="fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-center lg:flex"
+        aria-label="Tower altitude"
       >
-        <div className="flex flex-col items-center gap-6 py-6 px-2.5 rounded-full bg-[#0a0f18]/60 backdrop-blur-md border border-[rgba(201,163,106,0.15)] shadow-xl pointer-events-auto">
-          <span className="text-[9px] uppercase tracking-[0.25em] text-[#8f9ba8] font-sans -rotate-90 origin-center mb-2">
-            ALTITUDE
+        <div className="flex flex-col items-center gap-5 rounded-full border border-brass/15 bg-ink/60 px-2.5 py-6 shadow-xl backdrop-blur-md">
+          <span className="text-[9px] uppercase tracking-[0.25em] text-mist [writing-mode:vertical-rl] rotate-180" aria-hidden="true">
+            Altitude
           </span>
-
-          <div className="w-[1px] h-8 bg-gradient-to-b from-transparent via-[rgba(201,163,106,0.3)] to-[rgba(201,163,106,0.1)]" />
-
-          <div className="flex flex-col items-center gap-4">
-            {LEVELS.map((lvl) => {
-              const isActive = activeLevel === lvl.id;
+          <span className="h-8 w-px bg-gradient-to-b from-transparent to-brass/30" aria-hidden="true" />
+          <ol className="flex flex-col items-center gap-3">
+            {LEVELS.map((level) => {
+              const isActive = activeLevel === level.id;
               return (
-                <div
-                  key={lvl.id}
-                  className="group relative flex items-center justify-center cursor-pointer"
-                  title={lvl.title}
-                >
-                  <span
-                    className={`font-mono text-[10px] tracking-wider transition-all duration-300 ${
-                      isActive
-                        ? "text-[#c9a36a] font-bold scale-110"
-                        : "text-[#8f9ba8] opacity-60 hover:opacity-100"
+                <li key={level.id}>
+                  <a
+                    href={`#${level.id}`}
+                    title={level.title}
+                    aria-current={isActive ? "location" : undefined}
+                    className={`block rounded px-1.5 py-0.5 font-mono text-[10px] tracking-wider transition-all duration-300 ${
+                      isActive ? "scale-110 font-bold text-brass" : "text-mist hover:text-ivory"
                     }`}
                   >
-                    {lvl.label}
-                  </span>
-
-                  {/* Tooltip on hover */}
-                  <span className="absolute right-8 whitespace-nowrap bg-[#141d2b] border border-[rgba(201,163,106,0.25)] text-[#f4eee5] text-[10px] tracking-wider px-2 py-0.5 rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
-                    {lvl.title}
-                  </span>
-                </div>
+                    {level.label}
+                    <span className="sr-only"> — {level.title}</span>
+                  </a>
+                </li>
               );
             })}
-          </div>
-
-          <div className="w-[1px] h-8 bg-gradient-to-b from-[rgba(201,163,106,0.1)] via-[rgba(201,163,106,0.3)] to-transparent" />
-
-          {/* Current floor readout */}
-          <span className="font-mono text-[9px] text-[#c9a36a] font-semibold">
+          </ol>
+          <span className="h-8 w-px bg-gradient-to-b from-brass/30 to-transparent" aria-hidden="true" />
+          <span className="font-mono text-[9px] font-semibold tabular-nums text-brass" aria-hidden="true">
             {Math.round(scrollProgress * 28)}F
           </span>
         </div>
-      </aside>
+      </nav>
     </>
   );
 }

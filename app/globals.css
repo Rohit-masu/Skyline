@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 @theme {
   --color-ink: #0a0f18;
@@ -87,6 +87,150 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-brass);
+}
+
+/* ---------- Landing: scroll story ---------- */
+
+/* 0.5 = fully visible. Used when the 3D engine is not running (static mode, no JS). */
+.story-scene {
+  --scene-p: 0.5;
+}
+
+/* 3D mode: the engine writes --scene-p (0..1) on every scene, so text fades in over the
+   first sixth of a scene and out over the last sixth, in sync with the camera. */
+html[data-scene-mode="3d"] .story-panel {
+  --enter: clamp(0, calc(var(--scene-p) * 6), 1);
+  --leave: clamp(0, calc((1 - var(--scene-p)) * 6), 1);
+  opacity: min(var(--enter), var(--leave));
+  transform: translate3d(0, calc((1 - var(--enter)) * 48px - (1 - var(--leave)) * 48px), 0);
+  will-change: opacity, transform;
+  /* Soft dark halo so text stays readable over bright parts of the 3D scene. */
+  text-shadow: 0 2px 24px rgba(10, 15, 24, 0.85), 0 1px 3px rgba(10, 15, 24, 0.6);
+}
+
+/* display:none also stops the lazy still images from downloading in 3D mode. */
+html[data-scene-mode="3d"] .story-still {
+  display: none;
+}
+
+/* Static mode without reduced motion: CSS scroll-driven fade where supported, zero JS. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    html[data-scene-mode="static"] .story-panel {
+      animation: panel-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 35%;
+    }
+  }
+}
+
+@keyframes panel-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 48px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Masks for word-by-word reveals (see components/motion/SplitWords.tsx). */
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ---------- Landing: hero ---------- */
+
+/* Light sheen sweeping across a brass word. */
+.text-shimmer {
+  background: linear-gradient(110deg, #b8915a 30%, #f6deb0 48%, #c9a36a 62%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s ease-in-out 2s infinite;
+  padding-right: 0.08em;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  60%, 100% {
+    background-position: -50% 0;
+  }
+}
+
+/* Warm light following the pointer; --spot-x / --spot-y are written by HeroSpotlight. */
+.hero-spotlight {
+  background: radial-gradient(520px circle at var(--spot-x, 70%) var(--spot-y, 40%), rgba(223, 186, 130, 0.14), transparent 65%);
+  mix-blend-mode: screen;
+  transition: opacity 600ms ease-out;
+}
+
+/* Endless ticker: two identical lists, moved by exactly one list width. */
+.ticker {
+  animation: ticker 45s linear infinite;
+}
+
+.ticker:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.scroll-nudge {
+  animation: nudge 1.8s ease-in-out infinite;
+}
+
+@keyframes nudge {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+
+/* ---------- Landing: hero intro (CSS only, so it never waits for JavaScript) ---------- */
+
+.hero-fade {
+  animation: fade-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes letter-rise {
+  from {
+    transform: translate3d(0, 105%, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Reduced motion accessibility */

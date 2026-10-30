@@ -31,9 +31,9 @@ export function Header() {
 
   const navLinks = [
     { label: "Residences", href: "/properties" },
-    { label: "The Ascent", href: "/#story" },
-    { label: "Amenities", href: "/#amenities" },
-    { label: "Floor Plans", href: "/#floorplans" },
+    { label: "The Ascent", href: "/#arrival" },
+    { label: "Amenities", href: "/#pool" },
+    { label: "Floor Plans", href: "/#inside" },
     { label: "Location", href: "/#location" },
   ];
 

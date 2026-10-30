@@ -1,9 +1,9 @@
-﻿import Link from "next/link";
-import { ArrowUpRight, Compass, Phone, Mail, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { Phone, Mail, ShieldCheck } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="relative bg-[#06090f] text-[#8f9ba8] pt-24 pb-12 overflow-hidden border-t border-[rgba(201,163,106,0.15)]">
+    <footer className="relative z-10 bg-[#06090f] text-[#8f9ba8] pt-24 pb-12 overflow-hidden border-t border-[rgba(201,163,106,0.15)]">
       {/* Background Watermark */}
       <div
         className="absolute bottom-0 left-1/2 -translate-x-1/2 select-none pointer-events-none w-full text-center overflow-hidden opacity-5"
@@ -46,24 +46,24 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="/#story" className="hover:text-[#c9a36a] transition-colors">
+                <Link href="/#arrival" className="hover:text-[#c9a36a] transition-colors">
                   The Ascent Story
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/#amenities" className="hover:text-[#c9a36a] transition-colors">
+                <Link href="/#pool" className="hover:text-[#c9a36a] transition-colors">
                   Podium Amenities
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/#floorplans" className="hover:text-[#c9a36a] transition-colors">
+                <Link href="/#inside" className="hover:text-[#c9a36a] transition-colors">
                   Floor Plans & Layouts
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/#view" className="hover:text-[#c9a36a] transition-colors">
+                <Link href="/#garden" className="hover:text-[#c9a36a] transition-colors">
                   The View Experience
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
