@@ -3,9 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { SceneLabels } from "./SceneLabels";
 
-// Fallback delay when requestIdleCallback is missing (Safari).
-const IDLE_FALLBACK_MS = 1200;
-
 type SceneMode = "static" | "3d";
 
 function setPageMode(mode: SceneMode | null): void {
@@ -14,29 +11,19 @@ function setPageMode(mode: SceneMode | null): void {
 }
 
 function prefersStatic(): boolean {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
   if (connection?.saveData) return true;
   try {
-    return !document.createElement("canvas").getContext("webgl2");
+    const canvas = document.createElement("canvas");
+    return !canvas.getContext("webgl2");
   } catch {
     return true;
   }
 }
 
-function whenIdle(callback: () => void): () => void {
-  // The DOM types claim it always exists, but Safari still ships without it.
-  if (typeof window.requestIdleCallback === "function") {
-    const id = window.requestIdleCallback(callback, { timeout: IDLE_FALLBACK_MS * 2 });
-    return () => window.cancelIdleCallback(id);
-  }
-  const id = window.setTimeout(callback, IDLE_FALLBACK_MS);
-  return () => window.clearTimeout(id);
-}
-
-// Decides between the 3D story and the static story, and lazy-loads three.js after first paint.
-// The fixed canvas only shows once the first frame has rendered (never a blank or black flash),
-// The pinned hero (z-[2]) covers it until the hero lifts away.
+// Decides between the 3D story and the static story, and loads three.js right away.
+// The fixed canvas only shows once the first frame has rendered (never a blank or black flash).
+// The pinned hero covers it until the hero lifts away.
 export function SceneLoader() {
   const hostRef = useRef<HTMLDivElement>(null);
   const labelLayerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +52,7 @@ export function SceneLoader() {
       setPageMode("static");
     }
 
-    const cancelIdle = whenIdle(() => {
+    const timer = setTimeout(() => {
       import("@/three/boot")
         .then(({ boot }) => {
           // Strict Mode or a quick navigation may have unmounted us while the chunk downloaded.
@@ -85,11 +72,11 @@ export function SceneLoader() {
         .catch(() => {
           if (!cancelled) fallBackToStatic();
         });
-    });
+    }, 0);
 
     return () => {
       cancelled = true;
-      cancelIdle();
+      clearTimeout(timer);
       dispose?.();
       setPageMode(null);
     };
