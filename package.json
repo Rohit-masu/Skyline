@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "seed": "tsx scripts/generate_properties.ts",
+    "db:setup": "tsx scripts/db-setup.ts",
     "analyze": "next analyze",
     "posters:capture": "node scripts/capture-posters.mjs",
     "posters": "tsx scripts/make-posters.ts"

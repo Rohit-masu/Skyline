@@ -1,89 +1,58 @@
-﻿import { NextRequest, NextResponse } from "next/server";
-import { PROPERTIES_DATA } from "@/data/properties";
+import { NextRequest, NextResponse } from "next/server";
 import { enquirySchema } from "@/lib/schema/enquiry";
-import { hashIp, checkRateLimit, saveEnquiry } from "@/lib/storage/enquiries";
+import { getPropertyBySlug } from "@/lib/properties";
+import { checkRateLimit, hashIp, saveEnquiry } from "@/lib/storage/enquiries";
+
+function clientIp(request: NextRequest): string {
+  // Vercel puts the real client first in x-forwarded-for.
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+}
 
 export async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { error: "Malformed JSON request" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Malformed JSON body" }, { status: 400 });
   }
 
-  // Extract client IP
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  const ip = forwardedFor ? forwardedFor.split(",")[0]?.trim() || "127.0.0.1" : "127.0.0.1";
-  const ipHash = hashIp(ip);
-
-  // Rate Limiting (max 5 per 10 minutes)
-  const rateLimitResult = checkRateLimit(ipHash);
-  if (!rateLimitResult.allowed) {
-    return NextResponse.json(
-      { error: "Too many enquiries from this connection. Please try again later." },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(rateLimitResult.retryAfterSeconds ?? 600),
-        },
-      }
-    );
+  // Honeypot filled: answer like a success so bots learn nothing, but store nothing.
+  if (body && typeof body === "object" && "company" in body && typeof body.company === "string" && body.company.trim()) {
+    return NextResponse.json({ id: crypto.randomUUID() }, { status: 201 });
   }
 
-  // Honeypot check (bot protection: if 'company' field is filled, return 201 fake success without saving)
-  const candidate = body as Record<string, unknown> | null;
-  if (candidate && typeof candidate.company === "string" && candidate.company.trim().length > 0) {
-    return NextResponse.json(
-      { id: `enq-hp-${Date.now()}`, message: "Enquiry submitted successfully." },
-      { status: 201 }
-    );
-  }
-
-  // Validate request body with Zod schema
   const parsed = enquirySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       {
         error: "Validation failed",
-        issues: parsed.error.issues.map((i) => ({
-          path: i.path.join("."),
-          message: i.message,
-        })),
+        issues: parsed.error.issues.map((issue) => ({ path: issue.path.join("."), message: issue.message })),
       },
       { status: 400 }
     );
   }
 
-  const data = parsed.data;
-
-  // Validate that the property slug actually exists in our database
-  const propertyExists = PROPERTIES_DATA.some((p) => p.slug === data.propertySlug);
-  if (!propertyExists) {
+  if (!getPropertyBySlug(parsed.data.propertySlug)) {
     return NextResponse.json(
-      {
-        error: "Referenced property does not exist",
-        issues: [
-          {
-            path: "propertySlug",
-            message: `Property with slug '${data.propertySlug}' was not found`,
-          },
-        ],
-      },
+      { error: "Unknown property", issues: [{ path: "propertySlug", message: "This home does not exist" }] },
       { status: 400 }
     );
   }
 
-  // Save enquiry
-  const saved = saveEnquiry(data, ipHash);
+  try {
+    const ipHash = hashIp(clientIp(request));
+    const limit = await checkRateLimit(ipHash);
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: "Too many enquiries from this connection. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+      );
+    }
 
-  return NextResponse.json(
-    {
-      id: saved.id,
-      message: "Enquiry received. Our private relationship manager will reach out to you shortly.",
-    },
-    { status: 201 }
-  );
+    const { id } = await saveEnquiry(parsed.data, ipHash);
+    return NextResponse.json({ id }, { status: 201 });
+  } catch (error) {
+    console.error("Saving enquiry failed:", error);
+    return NextResponse.json({ error: "Could not save your enquiry. Please try again." }, { status: 500 });
+  }
 }
