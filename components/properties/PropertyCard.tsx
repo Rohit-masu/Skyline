@@ -22,7 +22,7 @@ export function PropertyCard({ property, priority = false, index = 0, large = fa
   const tag =
     property.featured
       ? "★ FEATURED"
-      : property.type === "penthouse"
+      : property.type === "Penthouse"
       ? "PENTHOUSE"
       : property.furnished
       ? "FURNISHED"

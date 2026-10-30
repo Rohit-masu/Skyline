@@ -20,7 +20,7 @@ export function FeaturedCard({ property, index, large = false }: FeaturedCardPro
   const tag =
     index === 0 || property.featured
       ? "★ FEATURED"
-      : property.type === "penthouse"
+      : property.type === "Penthouse"
       ? "PENTHOUSE"
       : property.furnished
       ? "FURNISHED"
