@@ -1,11 +1,12 @@
-﻿"use client";
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
 import { Bed, Bath, Maximize2, MapPin, ArrowUpRight, Sparkles } from "lucide-react";
 import type { Property } from "@/types/property";
 import { formatPrice, formatArea, formatNumber } from "@/lib/format";
+import { FavouriteButton } from "./FavouriteButton";
+
+const FALLBACK_IMAGE = "/images/landing/hero-tower.jpg";
 
 interface PropertyCardProps {
   property: Property;
@@ -13,9 +14,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, priority = false }: PropertyCardProps) {
-  const [imgSrc, setImgSrc] = useState(
-    property.images?.[0] || "/images/landing/hero-tower.jpg"
-  );
+  const image = property.images[0] ?? FALLBACK_IMAGE;
 
   return (
     <article
@@ -25,24 +24,24 @@ export function PropertyCard({ property, priority = false }: PropertyCardProps) 
       {/* Visual Image Presentation */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#0c121c]">
         <Image
-          src={imgSrc}
+          src={image}
           alt={`${property.title} - ${property.locality}, ${property.city}`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           priority={priority}
-          onError={() => setImgSrc("/images/landing/hero-tower.jpg")}
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-transparent to-black/20 opacity-80" />
 
         {/* Badges Top Bar */}
-        <div className="absolute top-3.5 inset-x-3.5 flex items-center justify-between gap-2 z-10 pointer-events-none">
+        <div className="absolute top-3.5 inset-x-3.5 flex items-start justify-between gap-2 z-10">
+          <div className="flex flex-wrap items-center gap-2 pointer-events-none">
           <span className="bg-[#0a0f18]/85 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono tracking-widest text-[#c9a36a] border border-[rgba(201,163,106,0.25)] uppercase">
             {property.type}
           </span>
           {property.featured ? (
             <span className="bg-[#c9a36a]/90 backdrop-blur-md text-[#0a0f18] px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold tracking-wider flex items-center gap-1 shadow-sm uppercase">
-              <Sparkles className="w-3 h-3" />
+              <Sparkles aria-hidden="true" className="w-3 h-3" />
               Featured
             </span>
           ) : (
@@ -50,6 +49,8 @@ export function PropertyCard({ property, priority = false }: PropertyCardProps) 
               FL {property.floor}/{property.totalFloors}
             </span>
           )}
+          </div>
+          <FavouriteButton slug={property.slug} title={property.title} size="sm" />
         </div>
 
         {/* Price Tag Overlay at Bottom of Image */}

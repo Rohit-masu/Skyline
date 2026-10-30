@@ -69,6 +69,82 @@ body {
   transform: translateY(-1px);
 }
 
+/* Visible keyboard focus everywhere (mouse clicks don't show it). */
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+}
+
+/* Shared look for inputs and selects on listings, detail and the form. */
+.field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  background: rgba(20, 29, 43, 0.6);
+  color: var(--color-ivory);
+  font-size: 0.875rem;
+  transition: border-color 150ms ease-out;
+}
+
+.field::placeholder {
+  color: rgba(143, 155, 168, 0.7);
+}
+
+.field:hover,
+.field:focus-visible {
+  border-color: var(--color-brass);
+}
+
+.field[aria-invalid="true"] {
+  border-color: #f87171;
+}
+
+/* Results and gallery crossfade. */
+.animate-fade-in {
+  animation: fade-in 250ms ease-out both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Skeleton sheen */
+.animate-shimmer {
+  animation: skeleton-sheen 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Mobile filter drawer (<dialog>) */
+.filter-drawer {
+  margin: 0 0 0 auto;
+  height: 100dvh;
+  max-height: none;
+  width: min(24rem, 100vw);
+  border: none;
+  border-left: 1px solid var(--color-border);
+  background: #0e1624;
+  color: var(--color-ivory);
+  padding: 0;
+}
+
+.filter-drawer::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
 /* Hairline borders */
 .border-brass-hairline {
   border-color: rgba(201, 163, 106, 0.25);

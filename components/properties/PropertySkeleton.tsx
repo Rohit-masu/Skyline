@@ -1,4 +1,4 @@
-﻿export function PropertyCardSkeleton() {
+export function PropertyCardSkeleton() {
   return (
     <div
       className="flex flex-col rounded-2xl overflow-hidden bg-[#141d2b]/30 border border-[rgba(255,255,255,0.06)] animate-pulse"
