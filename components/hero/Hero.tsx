@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, ChevronDown, Compass } from "lucide-react";
+import { PAVILION } from "@/lib/site";
 import { HeroSpotlight } from "./HeroSpotlight";
 
 // One headline line, split into letters that rise out of a mask on load (CSS only).
@@ -49,13 +50,21 @@ export function Hero() {
       </div>
       <HeroSpotlight />
 
-      {/* Top Location Meta */}
+      {/* Location meta: a quiet detail, not content (small, muted; full mist colour keeps AA contrast),
+          and a link to the site on Maps.
+          Phones show the coordinates only, so the line never wraps at 360 px. */}
       <div className="hero-fade relative z-10 mx-auto w-full max-w-7xl px-4 pt-4 sm:px-8 lg:px-12">
-        <div className="flex items-center gap-2 font-mono text-[11px] tracking-wider text-mist">
-          <Compass className="h-3.5 w-3.5 text-brass" aria-hidden="true" />
+        <a
+          href={PAVILION.mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 font-mono text-[10px] tracking-wider text-mist transition-colors duration-300 hover:text-ivory"
+        >
+          <Compass className="h-3.5 w-3.5 text-brass transition-transform duration-500 group-hover:rotate-45" aria-hidden="true" />
           <span>28.5355° N, 77.3910° E</span>
-          <span className="text-ivory/70">· SECTOR 128, NOIDA EXPRESSWAY</span>
-        </div>
+          <span className="hidden sm:inline">· SECTOR 128, NOIDA EXPRESSWAY</span>
+          <span className="sr-only">(open in Maps, new tab)</span>
+        </a>
       </div>
 
       {/* Main Editorial Hero Content */}
@@ -107,15 +116,6 @@ export function Hero() {
             Explore the tower
             <ChevronDown className="scroll-nudge h-4 w-4 text-brass" aria-hidden="true" />
           </a>
-        </div>
-
-        {/* Quiet Bottom Footprint Tag */}
-        <div
-          className="hero-fade mt-10 sm:mt-12 flex items-center gap-3 font-mono text-[11px] tracking-[0.25em] text-mist/70 uppercase"
-          style={{ animationDelay: "1300ms" }}
-        >
-          <span className="h-px w-8 bg-brass/60" aria-hidden="true" />
-          Noida Expressway · Sector 128
         </div>
       </div>
     </section>
