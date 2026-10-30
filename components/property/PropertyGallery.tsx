@@ -1,142 +1,88 @@
-﻿"use client";
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Maximize2, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PropertyGalleryProps {
   images: string[];
   title: string;
-  propertyType: string;
 }
 
-export function PropertyGallery({ images, title, propertyType }: PropertyGalleryProps) {
+// All photos are stacked and only the active one is opaque, so switching is a CSS crossfade.
+// Arrow keys work while focus is inside the gallery only, so the page keeps normal scrolling.
+export function PropertyGallery({ images, title }: PropertyGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const galleryRef = useRef<HTMLDivElement>(null);
+  const count = images.length;
 
-  const safeImages = images && images.length > 0 ? images : ["/images/landing/hero-tower.jpg"];
+  const show = (index: number) => setActiveIndex((index + count) % count);
 
-  const handlePrev = useCallback(() => {
-    setActiveIndex((prev) => (prev === 0 ? safeImages.length - 1 : prev - 1));
-  }, [safeImages.length]);
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      show(activeIndex - 1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      show(activeIndex + 1);
+    }
+  };
 
-  const handleNext = useCallback(() => {
-    setActiveIndex((prev) => (prev === safeImages.length - 1 ? 0 : prev + 1));
-  }, [safeImages.length]);
-
-  // Keyboard navigation: ArrowLeft and ArrowRight
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle if focused within gallery or active element is body
-      if (
-        document.activeElement?.tagName === "INPUT" ||
-        document.activeElement?.tagName === "TEXTAREA"
-      ) {
-        return;
-      }
-
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        handlePrev();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        handleNext();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handlePrev, handleNext]);
+  const arrowClass =
+    "pointer-events-auto flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-brass/30 bg-ink/80 text-ivory shadow-lg backdrop-blur-md transition-colors duration-200 hover:bg-brass hover:text-ink";
 
   return (
-    <section
-      ref={galleryRef}
-      className="space-y-4"
-      aria-label={`${title} Architectural Gallery`}
-      tabIndex={0}
-      role="region"
-    >
-      {/* Main Feature Viewport */}
-      <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0e1624] border border-[rgba(201,163,106,0.2)] shadow-2xl">
-        <Image
-          src={safeImages[activeIndex] || "/images/landing/hero-tower.jpg"}
-          alt={`${title} - View ${activeIndex + 1} of ${safeImages.length} (${propertyType})`}
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 75vw"
-          className="object-cover transition-all duration-700 ease-out"
-        />
+    <section aria-roledescription="carousel" aria-label={`${title} photos`} onKeyDown={handleKeyDown} className="space-y-4">
+      <div
+        className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-brass/20 bg-[#0e1624] sm:aspect-[16/9] sm:rounded-3xl"
+      >
+        {images.map((src, index) => (
+          <Image
+            key={`${index}-${src}`}
+            src={src}
+            alt={`${title}, photo ${index + 1} of ${count}`}
+            fill
+            priority={index === 0}
+            sizes="(max-width: 1024px) 100vw, 66vw"
+            aria-hidden={index !== activeIndex}
+            className={`object-cover transition-opacity duration-300 ease-out ${index === activeIndex ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-black/20" />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18]/80 via-transparent to-black/30 pointer-events-none" />
+        <p aria-live="polite" className="absolute right-4 top-4 rounded-full border border-brass/25 bg-ink/85 px-3.5 py-1.5 text-xs text-brass backdrop-blur-md sm:right-6 sm:top-6">
+          {activeIndex + 1} / {count}
+        </p>
 
-        {/* Counter Badge */}
-        <div className="absolute top-4 sm:top-6 right-4 sm:right-6 bg-[#0a0f18]/85 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-mono text-[#c9a36a] border border-[rgba(201,163,106,0.25)] flex items-center gap-2 pointer-events-none z-10">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>
-            {activeIndex + 1} / {safeImages.length}
-          </span>
-        </div>
-
-        {/* Left / Right Nav Arrows */}
-        {safeImages.length > 1 && (
-          <div className="absolute inset-y-0 inset-x-3 sm:inset-x-5 flex items-center justify-between pointer-events-none z-10">
-            <button
-              onClick={handlePrev}
-              className="p-3 rounded-full bg-[#0a0f18]/80 backdrop-blur-md text-[#f4eee5] hover:text-[#0a0f18] hover:bg-[#c9a36a] border border-[rgba(201,163,106,0.3)] transition-all pointer-events-auto cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a36a] shadow-lg"
-              aria-label="Previous image (ArrowLeft)"
-            >
-              <ChevronLeft className="w-5 h-5" />
+        {count > 1 && (
+          <div className="pointer-events-none absolute inset-x-3 inset-y-0 flex items-center justify-between sm:inset-x-5">
+            <button type="button" onClick={() => show(activeIndex - 1)} aria-label="Previous photo" className={arrowClass}>
+              <ChevronLeft aria-hidden="true" className="h-5 w-5" />
             </button>
-            <button
-              onClick={handleNext}
-              className="p-3 rounded-full bg-[#0a0f18]/80 backdrop-blur-md text-[#f4eee5] hover:text-[#0a0f18] hover:bg-[#c9a36a] border border-[rgba(201,163,106,0.3)] transition-all pointer-events-auto cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a36a] shadow-lg"
-              aria-label="Next image (ArrowRight)"
-            >
-              <ChevronRight className="w-5 h-5" />
+            <button type="button" onClick={() => show(activeIndex + 1)} aria-label="Next photo" className={arrowClass}>
+              <ChevronRight aria-hidden="true" className="h-5 w-5" />
             </button>
           </div>
         )}
-
-        {/* Keyboard Helper Tooltip (Visible on hover/focus) */}
-        <div className="absolute bottom-4 left-4 sm:left-6 text-[11px] font-mono text-[#8f9ba8] bg-[#0a0f18]/70 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/5 pointer-events-none hidden sm:block">
-          Use ← / → keyboard arrows to cycle views
-        </div>
       </div>
 
-      {/* Thumbnail Bar */}
-      {safeImages.length > 1 && (
-        <div
-          className="grid grid-cols-4 sm:grid-cols-6 gap-2.5 sm:gap-3.5 pt-2"
-          role="tablist"
-          aria-label="Image Thumbnails"
-        >
-          {safeImages.map((img, idx) => {
-            const isActive = idx === activeIndex;
-            return (
+      {count > 1 && (
+        <ul aria-label="Choose a photo" className="grid grid-cols-4 gap-2.5 sm:grid-cols-6 sm:gap-3.5">
+          {images.map((src, index) => (
+            <li key={`${index}-${src}`}>
               <button
-                key={idx}
-                role="tab"
-                aria-selected={isActive}
-                aria-label={`View image ${idx + 1}`}
-                onClick={() => setActiveIndex(idx)}
-                className={`relative aspect-[16/10] rounded-xl overflow-hidden bg-[#0e1624] border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a36a] ${
-                  isActive
-                    ? "border-[#c9a36a] shadow-[0_0_15px_rgba(201,163,106,0.35)] scale-[1.02]"
-                    : "border-transparent opacity-60 hover:opacity-100 hover:border-white/20"
+                type="button"
+                onClick={() => show(index)}
+                aria-label={`Show photo ${index + 1}`}
+                aria-current={index === activeIndex ? "true" : undefined}
+                className={`relative block aspect-[16/10] w-full cursor-pointer overflow-hidden rounded-xl border-2 transition duration-200 ${
+                  index === activeIndex ? "border-brass" : "border-transparent opacity-60 hover:opacity-100"
                 }`}
               >
-                <Image
-                  src={img}
-                  alt={`${title} thumbnail ${idx + 1}`}
-                  fill
-                  sizes="120px"
-                  className="object-cover"
-                />
+                <Image src={src} alt="" fill sizes="120px" className="object-cover" />
               </button>
-            );
-          })}
-        </div>
+            </li>
+          ))}
+        </ul>
       )}
     </section>
   );
