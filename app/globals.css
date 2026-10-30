@@ -199,21 +199,28 @@ body {
       animation-range: entry calc(var(--i, 0) * 10%) entry calc(70% + var(--i, 0) * 10%);
     }
 
+    /* overflow: clip (not hidden) on the footer and this box: hidden makes an element a scroll
+       container, and view timelines would then track that box instead of the page scroll.
+       The word is taller than its clipping box, so it follows the box's timeline (named below),
+       not its own: the box is the last thing on the page, so the word is fully up exactly when
+       the visitor reaches the bottom. */
+    .footer-brand {
+      view-timeline-name: --footer-brand;
+    }
+
     .footer-watermark {
-      animation: watermark-open linear both;
-      animation-timeline: view();
+      animation: watermark-rise linear both;
+      animation-timeline: --footer-brand;
       animation-range: entry 0% entry 100%;
     }
   }
 }
 
-@keyframes watermark-open {
+@keyframes watermark-rise {
   from {
-    opacity: 0;
-    transform: translate3d(0, 30%, 0) scaleX(0.85);
+    transform: translate3d(0, 100%, 0);
   }
   to {
-    opacity: 1;
     transform: none;
   }
 }

@@ -15,7 +15,7 @@ const columnTitle = "text-[11px] uppercase tracking-[0.25em] text-ivory/90";
 // .footer-reveal in globals.css): no GSAP on listings/detail, and without support it simply shows.
 export function Footer() {
   return (
-    <footer className="relative z-10 overflow-hidden border-t border-white/5 bg-ink-deep text-mist">
+    <footer className="relative z-10 overflow-clip border-t border-white/5 bg-ink-deep text-mist">
       <div className="section-inner relative pb-10 pt-20 lg:pt-24">
         <div
           className="footer-reveal flex flex-col justify-between gap-8 border-b border-white/5 pb-14 sm:flex-row sm:items-end"
@@ -76,9 +76,13 @@ export function Footer() {
         </div>
       </div>
 
-      <p aria-hidden="true" className="footer-watermark pointer-events-none select-none whitespace-nowrap text-center font-display text-[14vw] font-light uppercase leading-[0.8] tracking-[0.3em] text-brass/[0.04]">
-        Skyline
-      </p>
+      {/* Big brass wordmark that rises out of the bottom edge as the footer scrolls in. The box
+          is shorter than the letters, so their lower part stays cut off (like a horizon). */}
+      <div aria-hidden="true" className="footer-brand pointer-events-none h-[10vw] select-none overflow-clip">
+        <p className="footer-watermark whitespace-nowrap bg-gradient-to-b from-brass-light via-brass to-brass-dark bg-clip-text text-center font-display text-[16vw] font-semibold uppercase leading-[0.8] tracking-[0.1em] text-transparent">
+          Skyline
+        </p>
+      </div>
     </footer>
   );
 }
