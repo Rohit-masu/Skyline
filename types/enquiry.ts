@@ -1,4 +1,4 @@
-﻿export interface EnquiryInput {
+export interface EnquiryInput {
   name: string;
   phone: string;
   email?: string;

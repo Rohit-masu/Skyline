@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { formatPrice, formatArea, formatNumber } from "@/lib/format";
 
 describe("Format Utilities", () => {

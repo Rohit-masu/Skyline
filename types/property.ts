@@ -1,4 +1,4 @@
-﻿export type PropertyType = "Apartment" | "Penthouse" | "Duplex" | "Villa";
+export type PropertyType = "Apartment" | "Penthouse" | "Duplex" | "Villa";
 
 export type PropertySort = "price_asc" | "price_desc" | "newest";
 

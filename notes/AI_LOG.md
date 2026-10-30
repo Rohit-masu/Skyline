@@ -39,3 +39,11 @@ One line each: what the AI got wrong — how it was caught — fix.
 - First bloom pass blew out the white podium, the crown and the interior walls — poster captures — darker stone, off-white interior, threshold 0.82 -> 0.9, calmer lobby/crown emissive.
 - tsx ran scripts/make-posters.ts as CommonJS, so top-level await failed (ERR_REQUIRE_ASYNC_MODULE) — running the script — wrapped in main().
 - Amenity copy 'Train above the treeline' was unclear to Rohit — feedback — rewritten to say what each stop is.
+
+## Listings, detail, form, backend (2026-10-30)
+- The handover said listings/detail/form were "done", but reading them against AGENTS.md §8 showed gaps: no server-rendered results (client fetch only), no request-id guard, router.push instead of the History API, invalid API params silently defaulted instead of 400, form without aria-invalid, focus on first error, in-flight guard or 429 handling, window-wide arrow-key listener in the gallery — found by code review against the spec, fixed.
+- `animate-fade-in` and `animate-shimmer` classes were used but never defined (no effect) — reading globals.css — defined.
+- `/properties/unknown` returned 200 — curl status check — first tried `dynamicParams = false` (build error: not compatible with cacheComponents), then `"use cache"` on the page (still 200: fallback shell), finally proxy.ts rewrite → 404.
+- scripts/db-setup.ts used top-level await, which tsx runs as CommonJS — running it — wrapped in main() (the same mistake as make-posters.ts earlier).
+- Test-harness false alarms, app was fine: counted streamed cards still inside React's hidden Suspense container; read scrollY while a smooth scrollIntoView was still animating; clicked four filters in one synchronous tick (no re-render between); waited on a DOM node returned by value. Fixed the harness each time.
+- A `pkill -f "next start"` killed its own shell (the pattern matched the command line) — killed by port owner PID instead.

@@ -42,3 +42,25 @@ One line each: what — why — rejected alternative.
 - Poster and static stills are renders of our own 3D scene (scripts/capture-posters.mjs + scripts/make-posters.ts, WebP, ~1 MB total) — the brief requires a poster before WebGL loads; rendering it from the scene means poster, fallback and live 3D are the same picture — photography posters (style mismatch).
 - Art direction for the 3D matches the brand imagery: blue hour to night, warm gold facade, lit crown, finer dim city windows, darker trees, faint roads, soft bloom (high tier, threshold 0.9 so only light sources glow) — the first pass (orange sky, big bright window squares, bright green trees, orange road grid) read as a video game.
 - Amenity cards pinned to the 3D pool / gym / garden (same labels.ts as the room labels, per-label opacity) — Rohit wanted each 3D model described on scroll; the story copy was also rewritten to say plainly what each stop is.
+
+## Listings, detail, form, backend (main, 2026-10-30)
+- One data module `lib/properties.ts` used by the API routes, the listings/detail pages and FeaturedHomes — "featured homes loaded from your API" is met by calling the same function the API calls, at build time, instead of an HTTP request to our own API (no network hop, no localhost URL during build) — fetch('/api/properties') from a server component.
+- `lib/schema/query.ts` validates each URL param with its own small schema: the API combines them strictly (400 with a per-field message), the page and client parse leniently (a shared link with one bad value still shows results), and `serializeQuery` writes one canonical URL (fixed order, defaults left out) — two separate parsers that could drift apart.
+- Listings: URL is the only state; filters `pushState`, search `replaceState` after 300 ms, Next syncs useSearchParams with the History API. The debounced commit reads the live URL, so a filter clicked while typing is never overwritten. Results are cached per canonical query, so Back/Forward is instant — router.push (server round trip per keystroke).
+- Loading/error state is derived from "no result for this query key" rather than set at the start of the effect — fixes the `react-hooks/set-state-in-effect` lint errors without disabling the rule.
+- Back from detail: scrollY saved in sessionStorage per listing URL on card click and restored after results render — the listing re-renders on Back, so the browser's own restoration can run before the cards exist.
+- Pagination is real `<a href>` links (work without JS, crawlable); a plain left click is intercepted and turned into pushState.
+- Unknown detail slugs: `proxy.ts` rewrites them to an unmatched path so `not-found.tsx` renders with a real 404 status — with cacheComponents the route streams a prerendered shell (status 200 already sent) before `notFound()` runs, and `dynamicParams = false` is rejected by cacheComponents.
+- Detail page uses `"use cache"` + `cacheLife("hours")`, the cacheComponents equivalent of `revalidate = 3600` (`revalidate` is not allowed with cacheComponents).
+- Enquiries in Neon Postgres (`@neondatabase/serverless`, HTTP driver, already a dependency, server-only so 0 KB client JS). Rate limit = count of rows per `ip_hash` in the last 10 minutes (index on `ip_hash, created_at`), so it works across serverless instances. Without DATABASE_URL the same functions use memory, so local dev and tests need no database — a separate rate-limit store (Redis).
+- No default `IP_HASH_SALT` any more: a missing salt is a configuration error (500), not a silently weak hash.
+- Order in POST /api/enquiries: JSON → honeypot (fake 201) → validation → property exists → rate limit → insert. Only stored enquiries count toward the limit.
+- "Today" for the visit date is read on the client with useSyncExternalStore (server snapshot: no min/max). The page is prerendered at build time, so a server-side "today" would be stale and cause a hydration mismatch — setting it in useEffect (lint error, extra render).
+- Gallery: all photos stacked, opacity crossfade; arrow keys only while focus is inside the gallery — the old window-level listener stole arrow-key scrolling from the whole page.
+- Favourites (bonus) in localStorage through useSyncExternalStore: same list in every heart button, other tabs update via the storage event, empty list on the server (no hydration mismatch).
+- /admin (bonus): password from ADMIN_PASSWORD checked with a timing-safe compare; the cookie holds an HMAC of the password (httpOnly, sameSite strict, path /admin, 8 h), never the password. Page is noindex.
+- Shared-element view transition (bonus) skipped: it needs Next's experimental viewTransition flag; not worth the risk to stability.
+
+### Assumptions (listings/detail)
+- Nearby landmarks are a fixed list per city (the seed data has no per-home landmarks).
+- Price filter steps 25 L … 10 Cr as AGENTS.md §8.3; "No max" covers 10 Cr+ (seeded prices are 1.8–13.3 Cr).

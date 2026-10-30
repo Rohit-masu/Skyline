@@ -50,3 +50,29 @@ Listings, detail, form and API files are not written up here yet; AGENTS.md §7�
 **components/landing/SceneLabels.tsx + three/labels.ts** — One label layer for room labels and amenity cards. `labels.update(camera, { living: x, pool: y, ... })` sets each label's opacity and projects its 3D anchor to screen. Amenity anchors live in `three/amenities.ts` (children of the gym floor / roof so they move with them).
 
 **three/engine.ts bloom** — High tier renders through EffectComposer: RenderPass → UnrealBloomPass (`BLOOM` in config.ts) → OutputPass (tone mapping + sRGB). Low tier renders directly.
+
+## Data and API
+- `lib/properties.ts` — the only code that reads `data/properties.ts`. `searchProperties(query, limit)` filters, sorts (ties broken by id so pages never overlap) and paginates; `getSimilarProperties` scores same locality (2) + same BHK (1), then closest price. Used by every API route, both pages and FeaturedHomes.
+- `lib/schema/query.ts` — `fieldSchemas` validates each URL param alone. `propertyQuerySchema` (API, strict → 400), `parseQueryLenient` (pages/client, drops bad values), `serializeQuery` (canonical URL), `toPropertyQuery` (fills defaults). Tunables: `PAGE_SIZE`, `MAX_LIMIT`, `MAX_SEARCH_LENGTH`.
+- `app/api/*` — thin: parse, call `lib/properties.ts`, set Cache-Control.
+
+## Listings `/properties`
+- `app/properties/page.tsx` — server. Static shell (breadcrumb, title); `Listings` awaits searchParams inside Suspense, parses leniently, renders the first page on the server and passes it as `initialData`. `generateMetadata` builds titles like "3 BHK homes".
+- `PropertyListingsClient.tsx` — reads the URL (`useSearchParams` → `parseQueryLenient`) and writes it with `history.pushState` (filters, page) or `replaceState` (search). `currentQuery()` reads `window.location` at click time so a late debounced search keeps newer filters.
+- `useListingResults.ts` — results cached per canonical query key. Fetch only when the key has no result; AbortController + request id; loading/error derived, no setState in the effect body.
+- `useListingScrollRestore.ts` — saves scrollY per listing URL on card click, restores it once results are visible.
+- `FilterBar.tsx` (layout, sort, mobile `<dialog>`), `FilterControls.tsx` (BHK/type toggles with aria-pressed, price min/max, furnished radios; rendered twice with different `idPrefix`), `SearchBox.tsx` (300 ms debounce, syncs from URL only on outside changes), `ActiveFilterChips.tsx`, `Pagination.tsx` (real links, click intercepted).
+- Try: type "gurg" and immediately click "Apartment" → both stay in the URL. Open a card from row 3, press Back → same position.
+
+## Detail `/properties/[slug]`
+- `page.tsx` — `"use cache"` + `cacheLife("hours")`; all slugs prerendered. `PropertyFacts`, `LocationBlock` (+ `MapEmbed`, iframe only after "Show map"), `PropertyGallery` (stacked images, opacity crossfade, arrow keys inside the gallery).
+- `proxy.ts` — unknown slug → rewrite to an unmatched path → `not-found.tsx` with status 404.
+
+## Enquiry form + backend
+- `EnquiryForm.tsx` — `validateField` runs the field's schema from `enquirySchema.shape` (same as the server) on blur and on submit; first invalid field gets focus; `inFlight` ref blocks double submit; 400 issues mapped onto fields; 429 → minutes from Retry-After; input kept on every failure. `FormField.tsx` wires label, aria-invalid and aria-describedby.
+- `lib/storage/enquiries.ts` — Neon when DATABASE_URL is set, memory otherwise. `checkRateLimit` counts rows per ip_hash in the last 10 min (`RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MINUTES`). `scripts/db-setup.sql` + `npm run db:setup` create the table.
+- `app/api/enquiries/route.ts` — JSON → honeypot → validate → property exists → rate limit → insert → 201 `{ id }`.
+
+## Bonus
+- `lib/favourites.ts` + `components/properties/FavouriteButton.tsx` — saved homes in localStorage via useSyncExternalStore.
+- `app/admin` + `lib/admin-auth.ts` — password login (server action), HMAC cookie, table of enquiries.

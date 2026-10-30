@@ -2,13 +2,14 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PropertyCard } from "@/components/properties/PropertyCard";
 import { SplitWords } from "@/components/motion/SplitWords";
-import { PROPERTIES_DATA } from "@/data/properties";
+import { getFeaturedProperties } from "@/lib/properties";
 
 const FEATURED_COUNT = 6;
 
 // Opaque background (and z-10) so it slides over the fixed 3D canvas once the story ends.
 export function FeaturedHomes() {
-  const featured = PROPERTIES_DATA.filter((property) => property.featured).slice(0, FEATURED_COUNT);
+  // Same data function as GET /api/properties (see notes/DECISIONS.md): no HTTP hop to our own API at build time.
+  const featured = getFeaturedProperties(FEATURED_COUNT);
 
   return (
     <section

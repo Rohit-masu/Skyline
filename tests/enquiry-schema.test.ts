@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { enquirySchema, normalizeIndianPhone, getKolkataDateString } from "@/lib/schema/enquiry";
 
 describe("Enquiry Schema & Phone Normalization", () => {
