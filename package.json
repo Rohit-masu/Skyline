@@ -10,10 +10,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
-    "analyze": "next analyze"
+    "analyze": "next analyze",
+    "posters:capture": "node scripts/capture-posters.mjs",
+    "posters": "tsx scripts/make-posters.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
+    "gsap": "^3.13.0",
     "lucide-react": "^1.64.0",
     "next": "16.4.3",
     "react": "19.3.0",

@@ -49,3 +49,7 @@ docs/BRIEF.md
 
 # Windows download metadata
 *:Zone.Identifier
+
+# raw 3D captures (converted into public/posters)
+/.posters-raw/
+/.next-prod/
