@@ -1,18 +1,23 @@
-﻿import { z } from "zod";
+import { z } from "zod";
 
-// Helper to get today's date string in Asia/Kolkata timezone (YYYY-MM-DD)
-export function getKolkataDateString(offsetDays = 0): string {
-  const now = new Date();
-  if (offsetDays !== 0) {
-    now.setDate(now.getDate() + offsetDays);
-  }
-  const parts = new Intl.DateTimeFormat("en-CA", {
+export const VISIT_WINDOW_DAYS = 90;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** "Today" (plus offset days) as YYYY-MM-DD in Asia/Kolkata, whatever timezone the server or browser is in. */
+export function getKolkataDateString(offsetDays = 0, now = Date.now()): string {
+  // Plain millisecond arithmetic: no local-timezone or DST effects. India has no DST.
+  return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Kolkata",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(now);
-  return parts; // Returns YYYY-MM-DD
+  }).format(new Date(now + offsetDays * DAY_MS));
+}
+
+/** Rejects strings like 2026-02-31 that match the pattern but are not real dates. */
+function isRealDate(value: string): boolean {
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
 }
 
 // Normalize phone: strip spaces, dashes, parentheses, leading "+91" or "0"
@@ -55,12 +60,13 @@ export const enquirySchema = z
       .max(1000, "Message cannot exceed 1000 characters"),
     visitDate: z
       .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Visit date must be in YYYY-MM-DD format")
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Please choose a visit date")
+      .refine(isRealDate, "Please choose a valid date")
       .refine((dateStr) => {
         const today = getKolkataDateString(0);
-        const maxDate = getKolkataDateString(90);
+        const maxDate = getKolkataDateString(VISIT_WINDOW_DAYS);
         return dateStr >= today && dateStr <= maxDate;
-      }, "Visit date must be between today and the next 90 days"),
+      }, `Visit date must be between today and the next ${VISIT_WINDOW_DAYS} days`),
     propertySlug: z
       .string()
       .trim()
