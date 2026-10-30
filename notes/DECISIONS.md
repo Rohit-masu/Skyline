@@ -64,3 +64,7 @@ One line each: what — why — rejected alternative.
 ### Assumptions (listings/detail)
 - Nearby landmarks are a fixed list per city (the seed data has no per-home landmarks).
 - Price filter steps 25 L … 10 Cr as AGENTS.md §8.3; "No max" covers 10 Cr+ (seeded prices are 1.8–13.3 Cr).
+- Sections after the story (06 Featured, 07 Visit) share `SectionHeading` (numbered eyebrow + hairline, split heading, intro) and the `.section-shell` / `.section-inner` box, which is the same box as the header and listing pages, so every left edge lines up with the logo — per-section padding classes that had drifted apart (80 px vs 128 px).
+- Footer motion is CSS scroll-driven (`.footer-reveal`, `--i` stagger, watermark) instead of GSAP: the footer is on every page and GSAP is only loaded on the landing; unsupported browsers and reduced motion simply show it.
+- Visit section now has the pavilion address/hours card, so the header's "Location" link (was `/#location`, a dead anchor) points to `/#visit`. Contact details live once in `lib/site.ts`.
+- Altitude rail fades out (and is `inert`) when the story root leaves the middle of the viewport — it overlapped the featured cards and the footer.

@@ -31,7 +31,7 @@ Commands: `npm run dev` · `npm run typecheck` · `npm run lint` · `npm test` �
 1. **Deploy to Vercel** (skipped for now by Rohit) with `DATABASE_URL`, `IP_HASH_SALT`, `ADMIN_PASSWORD`, `NEXT_PUBLIC_SITE_URL`. Run `npm run db:setup` once against the production database.
 2. **First-load JS over budget** (~190 KB gz vs 130/120); React DOM + Next runtime are most of it. Measure with `npm run analyze`.
 3. **Reports in `/reports`**: Lighthouse mobile on the deployed site + bundle analyzer.
-4. **UI polish of static sections** (Rohit's request): Header, FeaturedHomes, VisitInvitation, Footer, cards, 404 — one consistent modern style. 3D stays as is.
+4. **UI polish**: Featured (06), Visit (07) and footer done (shared heading, one container, scroll animations). Left: mobile header tagline wraps to two lines.
 5. **3D on real hardware** (mid-range laptop / Android).
 6. **AI_USAGE.md** (Rohit, from `notes/AI_LOG.md`) and the **screen recording**.
 

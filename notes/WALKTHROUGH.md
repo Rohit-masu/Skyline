@@ -76,3 +76,9 @@ Listings, detail, form and API files are not written up here yet; AGENTS.md §7�
 ## Bonus
 - `lib/favourites.ts` + `components/properties/FavouriteButton.tsx` — saved homes in localStorage via useSyncExternalStore.
 - `app/admin` + `lib/admin-auth.ts` — password login (server action), HMAC cookie, table of enquiries.
+
+## Sections after the story + footer
+- `components/landing/SectionHeading.tsx` — numbered eyebrow, `SplitWords` heading (`data-split`), intro (`data-reveal`); the lazy GSAP layer animates those attributes.
+- `FeaturedHomes.tsx` (06) and `VisitInvitation.tsx` (07) — both use `.section-shell` + `.section-inner` from globals.css. Visit has a parallax photo and the pavilion card (`lib/site.ts`).
+- `components/layout/Footer.tsx` — real links only, contact from `lib/site.ts`; columns rise with `.footer-reveal` (CSS `animation-timeline: view()`, stagger via `--i`), watermark opens with `.footer-watermark`, links use `.link-underline`.
+- `components/ui/AltitudeRail.tsx` — second IntersectionObserver on `[data-story-root]` hides the rail after the story.

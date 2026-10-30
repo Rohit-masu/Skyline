@@ -18,7 +18,7 @@ export function PropertyCard({ property, priority = false }: PropertyCardProps) 
 
   return (
     <article
-      className="group relative flex flex-col rounded-2xl overflow-hidden bg-[#141d2b]/50 border border-[rgba(201,163,106,0.18)] hover:border-[#c9a36a] transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,0,0,0.45)] hover:-translate-y-1"
+      className="group relative flex w-full flex-col rounded-2xl overflow-hidden bg-[#141d2b]/50 border border-[rgba(201,163,106,0.18)] hover:border-[#c9a36a] transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,0,0,0.45)] hover:-translate-y-1"
       data-testid="property-card"
     >
       {/* Visual Image Presentation */}

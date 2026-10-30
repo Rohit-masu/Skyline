@@ -15,6 +15,8 @@ const LEVELS = [
 export function AltitudeRail() {
   const [activeLevel, setActiveLevel] = useState("hero");
   const [scrollProgress, setScrollProgress] = useState(0);
+  // The rail belongs to the 3D story; it fades out once Featured homes and the footer scroll in.
+  const [inStory, setInStory] = useState(true);
 
   useEffect(() => {
     let frame = 0;
@@ -41,11 +43,18 @@ export function AltitudeRail() {
       if (section) observer.observe(section);
     }
 
+    const storyRoot = document.querySelector("[data-story-root]");
+    const storyObserver = new IntersectionObserver(([entry]) => setInStory(entry?.isIntersecting ?? false), {
+      rootMargin: "-50% 0px -50% 0px",
+    });
+    if (storyRoot) storyObserver.observe(storyRoot);
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      storyObserver.disconnect();
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -57,8 +66,11 @@ export function AltitudeRail() {
       </div>
 
       <nav
-        className="fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-center lg:flex"
+        className={`fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-center transition-opacity duration-500 lg:flex ${
+          inStory ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
         aria-label="Tower altitude"
+        inert={!inStory}
       >
         <div className="flex flex-col items-center gap-5 rounded-full border border-brass/15 bg-ink/60 px-2.5 py-6 shadow-xl backdrop-blur-md">
           <span className="text-[9px] uppercase tracking-[0.25em] text-mist [writing-mode:vertical-rl] rotate-180" aria-hidden="true">

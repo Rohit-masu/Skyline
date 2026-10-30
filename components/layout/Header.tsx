@@ -34,7 +34,7 @@ export function Header() {
     { label: "The Ascent", href: "/#arrival" },
     { label: "Amenities", href: "/#pool" },
     { label: "Floor Plans", href: "/#inside" },
-    { label: "Location", href: "/#location" },
+    { label: "Location", href: "/#visit" },
   ];
 
   return (
