@@ -1,5 +1,11 @@
-﻿import fs from "fs";
+import fs from "fs";
+import path from "path";
 import type { Property } from "../types/property";
+
+// Fixed base date (the committed data was generated from it) so every run writes the same file
+// and the "newest" sort never changes between machines or days.
+const BASE_TIME = Date.parse("2026-10-29T15:17:12.214Z");
+const DAY_MS = 86_400_000;
 
 interface PropertySeed {
   title: string;
@@ -214,7 +220,7 @@ const properties: Property[] = seeds.map((s, idx) => {
       possessionDate: "December 2026",
     },
     coordinates: { lat: s.lat, lng: s.lng },
-    createdAt: new Date(Date.now() - idx * 86400000 * 2).toISOString(),
+    createdAt: new Date(BASE_TIME - idx * DAY_MS * 2).toISOString(),
   };
 });
 
@@ -277,11 +283,12 @@ for (let i = 0; i < 50; i++) {
       lat: Number((locObj.lat + (Math.sin(i) * 0.01)).toFixed(4)),
       lng: Number((locObj.lng + (Math.cos(i) * 0.01)).toFixed(4)),
     },
-    createdAt: new Date(Date.now() - (i + 6) * 86400000).toISOString(),
+    createdAt: new Date(BASE_TIME - (i + 6) * DAY_MS).toISOString(),
   });
 }
 
 const fileContent = `import type { Property } from "@/types/property";\n\nexport const PROPERTIES_DATA: Property[] = ${JSON.stringify(properties, null, 2)};\n`;
 
-fs.writeFileSync("/home/rohit/skyline/data/properties.ts", fileContent, "utf-8");
+// Relative to the project root, so it works on any machine (npm run seed).
+fs.writeFileSync(path.join(process.cwd(), "data", "properties.ts"), fileContent, "utf-8");
 console.log(`Successfully generated ${properties.length} luxury properties in data/properties.ts`);

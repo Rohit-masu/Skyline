@@ -108,6 +108,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Unit Tests**: `npm test` — **16 passing tests** across format utilities, query schemas, and enquiry validation.
 - **Type Safety**: `npm run typecheck` — **0 TypeScript errors** with `strict: true` and `noUncheckedIndexedAccess: true`.
 - **Production Build**: `NEXT_DIST_DIR=.next-prod npm run build` compiles with 0 errors.
+- **Lint**: `npm run lint` still reports 3 known errors in the listings/enquiry components; tracked in `TASKS.md`.
+- **Project status and pending work**: see `TASKS.md`.
 
 ---
 

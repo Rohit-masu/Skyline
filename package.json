@@ -9,7 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
+    "seed": "tsx scripts/generate_properties.ts",
     "analyze": "next analyze",
     "posters:capture": "node scripts/capture-posters.mjs",
     "posters": "tsx scripts/make-posters.ts"

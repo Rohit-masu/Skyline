@@ -1,14 +1,13 @@
 # AGENTS.md — Skyline (Frontend Assignment, Round 2)
 
-This file is the single source of truth for building this project. Read it fully before writing code, and re-read the relevant section before each milestone.
-
-> **Current phase: V2 (3D landing).** The landing is the scroll-driven three.js story in `three/` (§8.2), with GSAP only for DOM motion in its own lazy chunk. The hero paints a poster rendered from our own 3D scene (`npm run posters:capture` then `npm run posters`), so poster and live 3D look identical. `LANDING_V1_PLAN.md` is kept for its art direction only. The full assignment brief is in `docs/BRIEF.md`. Everything else here still applies.
+Rules, requirements and architecture for the project. **Status and pending work live in `TASKS.md`; read it first.**
+The original assignment text is in `docs/BRIEF.md`, which is gitignored (local only); its requirements are restated in §3, §7, §8, §10 and §12 below.
 
 ---
 
 ## 0. Context and working rules
 
-**What this is.** A 24-hour interview assignment for Rohit: "Skyline", a showcase site for a fictional luxury residential tower. Next.js App Router + TypeScript. Four routes: scroll-driven 3D landing, listings, detail, enquiry form + small API. The full brief is in `docs/BRIEF.md` (if it is missing, ask Rohit to paste it there).
+**What this is.** A 24-hour interview assignment for Rohit: "Skyline", a showcase site for a fictional luxury residential tower. Next.js App Router + TypeScript. Four routes: scroll-driven 3D landing, listings, detail, enquiry form + small API. Current status: everything is built; see `TASKS.md` for what is done and what is pending.
 
 **How it will be graded (100 pts, 70 to pass):** Stability & logic 25 · 3D & scroll 20 · Performance 20 · UI/UX 15 · Backend 10 · Code quality & docs 10. The graders will actively try to break the site.
 
@@ -21,51 +20,39 @@ This file is the single source of truth for building this project. Read it fully
 
 **Rules for you (the agent):**
 
-1. Work milestone by milestone (section 11). Do not start the next one until the current one's acceptance checks pass.
-2. After every milestone run `npm run typecheck && npm run lint && npm run build`. All must pass. Then make a small, clearly named commit (e.g. `feat(api): validated GET /api/properties`). Never one giant commit.
+1. Work through `TASKS.md` → Pending, in order. Do not start the next item until the current one is verified.
+2. After every task run `npm run typecheck && npm run lint && npm test && npm run build`. All must pass. Then make a small, clearly named commit (e.g. `feat(api): validated GET /api/properties`). Never one giant commit.
 3. Never add a dependency without stating its gzipped size and which bundle it lands in. Only the allowed stack in section 2.
 4. No `any`, no `@ts-ignore`, no `eslint-disable` to silence real problems.
 5. Do not copy code verbatim from tutorials, templates or other repos. References (section 14) are for ideas only. Plagiarism = disqualification.
 6. Keep two running notes files:
    - `notes/DECISIONS.md` — every non-obvious decision: what, why, what alternative was rejected. Also an "Assumptions" list. These feed the README.
    - `notes/AI_LOG.md` — anything you got wrong and how it was caught (failed build, wrong API, budget overshoot, bug found in testing). Rohit uses this to write an honest `AI_USAGE.md`.
-7. After each milestone, add a short "How it works" paragraph per new file to `notes/WALKTHROUGH.md` so Rohit can prepare for the call.
+7. After each task, add a short "How it works" paragraph per new file to `notes/WALKTHROUGH.md` so Rohit can prepare for the call.
 8. If a requirement is unclear, make a reasonable assumption, record it in `notes/DECISIONS.md` → Assumptions, and continue.
 9. Verify, don't assume: test in the browser (or describe exactly what Rohit should click) before marking something done.
 
 ---
 
-## 1. Step 0 — audit the existing setup
+## 1. Status
 
-Rohit thinks the base setup is done. Verify each item, fix what is missing, and report a short list of what you changed.
-
-- [ ] Next.js App Router + TypeScript; `tsconfig` has `"strict": true` and `"noUncheckedIndexedAccess": true`
-- [ ] `package.json` scripts: `dev`, `build`, `start`, `lint`, `typecheck` (`tsc --noEmit`), `seed`, `analyze`, `test`
-- [ ] Tailwind CSS configured (zero runtime JS). No JS-heavy UI library
-- [ ] ESLint with `next/core-web-vitals`
-- [ ] `.gitignore` covers `.env*` but not `.env.example`
-- [ ] `.env.example` present with every variable from section 6
-- [ ] Git initialised, remote set, first commit exists
-- [ ] `three` + `@types/three` installed. Nothing outside `src/three/` imports `three`
-- [ ] Default Next boilerplate removed (starter page, unused SVGs, default fonts)
-- [ ] `next.config.ts`: `images.formats = ['image/avif', 'image/webp']`, `reactStrictMode: true`, bundle analyzer behind `ANALYZE=true`
-- [ ] Bundle analysis works. If the installed Next version builds with Turbopack and `@next/bundle-analyzer` produces no report, use that version's built-in analyzer, or run `next build --webpack` only for the report. Record which in DECISIONS.md
-- [ ] `docs/BRIEF.md` contains the assignment text
+See `TASKS.md`. Update it (Done / Pending) in the same commit as the work.
 
 ---
 
-## 2. Stack (decided — ask Rohit before changing)
+## 2. Stack (as built — ask Rohit before changing)
 
 | Concern | Choice | Why |
 |---|---|---|
-| Framework | Next.js App Router, TypeScript strict | Required by brief |
-| Styling | Tailwind CSS | No runtime JS, keeps listing/detail under 120 KB |
-| 3D | **Vanilla three.js** (no React Three Fiber, no drei) | three alone is roughly 150–170 KB gz; R3F + its reconciler would push the 3D chunk past the 200 KB budget. Vanilla is also easier to explain |
-| Scroll animation | **Own damped-progress engine** (no GSAP, no Lenis) | Saves ~40 KB+, keeps native scroll (accessibility, INP), smooth both directions by construction. If GSAP is ever added, it goes only into the lazy 3D chunk |
-| Overlay text animation | CSS driven by CSS custom properties written from the same progress value | Guarantees DOM overlays are in sync with 3D |
-| Validation | Zod v4, one shared schema set for client + server | Brief requires shared types. If client-side zod pushes `/properties/[slug]` over budget, switch client imports to `zod/mini` |
-| Database | Neon Postgres (free tier) via `@neondatabase/serverless`, plain parameterised SQL in a small repository layer, no ORM | Vercel's filesystem is read-only/ephemeral, so SQLite/JSON can't persist enquiries. Rohit already works with Postgres |
-| Tests (bonus) | Vitest (filter↔URL, validation), Playwright (one e2e) | After core is done |
+| Framework | Next.js 16 App Router (Turbopack), React 19, TypeScript strict + `noUncheckedIndexedAccess` | Required by brief |
+| Styling | Tailwind CSS v4, tokens in `app/globals.css` | No runtime JS |
+| 3D | **Vanilla three.js** (no React Three Fiber, no drei), lazy chunk | three alone fits the 200 KB budget; easier to explain |
+| Scroll for 3D | Own damped-progress engine (`three/scroll.ts`) | Native scroll, smooth both directions, overlays synced via `--scene-p` |
+| DOM animation | GSAP 3.13 + ScrollTrigger, landing only, own lazy chunk (`components/motion/`) | Reveals, scrubbed words, parallax, magnetic buttons |
+| Validation | Zod v4, shared client + server (`lib/schema/`) | Same rules on both sides |
+| Data | Static `data/properties.ts` (56 homes, generated by `npm run seed`) | No DB yet; see TASKS.md → Pending 5 |
+| Enquiry storage + rate limit | In memory (`lib/storage/enquiries.ts`) | Temporary; planned: Neon Postgres via `@neondatabase/serverless` (installed, unused) |
+| Tests | Vitest (`tests/`) | Playwright e2e is a bonus |
 | Deploy | Vercel | Free, native Next support |
 
 **Forbidden:** `@react-three/fiber`, `@react-three/drei`, Spline runtime, `framer-motion`/`motion` on listing or detail pages, lodash, moment/dayjs (use `Intl`), carousel/slider libraries, axios, any paid template.
@@ -86,7 +73,7 @@ Rohit thinks the base setup is done. Verify each item, fix what is missing, and 
 | Lighthouse Performance (mobile, every route) | ≥ 90 |
 | Lighthouse Accessibility, Best Practices | ≥ 95 |
 
-**Check budgets at the end of every milestone** with the analyzer. If something grows unexpectedly, find out why before continuing.
+**Check budgets after every task** with the analyzer (`npm run analyze`). If something grows unexpectedly, find out why before continuing.
 
 Rules:
 - `three` must never appear in the initial bundle of any route.
@@ -96,112 +83,59 @@ Rules:
 
 ---
 
-## 4. Folder structure
+## 4. Folder structure (actual)
 
 ```
-src/
-  app/
-    layout.tsx               fonts, header/footer, metadata defaults
-    page.tsx                 landing (server component)
-    not-found.tsx            global 404
-    error.tsx                global error boundary
-    properties/
-      page.tsx               listings (SSR first page)
-      loading.tsx
-      [slug]/
-        page.tsx             detail (SSG + revalidate)
-        not-found.tsx
-    api/
-      properties/route.ts
-      properties/[slug]/route.ts
-      properties/[slug]/similar/route.ts
-      enquiries/route.ts
-    admin/                   bonus, last
-  components/
-    landing/                 HeroPoster, ScrollStory, StoryPanel, SceneLoader, StaticStory, FeaturedHomes
-    properties/              FilterBar, FilterDrawer, SearchInput, PropertyGrid, PropertyCard,
-                             Pagination, GridSkeleton, EmptyState, ErrorState
-    property/                Gallery, SpecList, Amenities, LocationBlock, SimilarList
-    enquiry/                 EnquiryForm, FieldError
-    ui/                      Button, Input, Select, Container, Skeleton
-  lib/
-    schema/                  property.ts, query.ts, enquiry.ts   (Zod — shared client + server)
-    db/                      client.ts, properties.ts, enquiries.ts
-    query/                   parse.ts, serialize.ts              (filter ↔ URL, pure functions)
-    format.ts                ₹ lakh/crore, sq ft, dates (Intl)
-    rate-limit.ts
-    http.ts                  json helpers, error shape
-  three/                     ONLY imported dynamically
-    boot.ts                  entry: creates engine, wires everything, returns dispose()
-    engine.ts                renderer, loop, resize, visibility, DPR cap, quality tier
-    scroll.ts                section measurement, damped progress
-    keyframes.ts             camera keyframes as plain data
-    tower.ts                 procedural tower + build-up
-    interior.ts              the "inside a home" floor plan
-    amenities.ts             pool, gym, garden
-    lighting.ts              env map, sun, shadows, day/night presets
-    labels.ts                3D → screen projection for DOM labels
-    interaction.ts           pointer parallax, floor hover
-    capture.ts               dev-only poster capture
-scripts/
-  seed.ts
-  schema.sql
-  make-placeholders.ts       generates placeholder property images if real photos are missing
-  make-posters.ts            converts captured PNGs to AVIF/WebP sizes
-public/
-  images/properties/
-  posters/
-reports/                     lighthouse-*.html, bundle-*.png/html
+app/
+  layout.tsx, globals.css, icon.svg, not-found.tsx
+  page.tsx                   landing: Hero + ScrollStory inside [data-story-root], FeaturedHomes, VisitInvitation
+  properties/page.tsx        listings
+  properties/[slug]/page.tsx detail (SSG)
+  api/properties/route.ts, api/properties/[slug]/route.ts, api/properties/[slug]/similar/route.ts, api/enquiries/route.ts
+components/
+  hero/                      Hero (poster + headline + ticker), HeroSpotlight
+  landing/                   SceneLoader (lazy 3D, static fallback), SceneLabels (DOM labels pinned to 3D),
+                             ScrollStory + StoryScene (chapters), FeaturedHomes, VisitInvitation
+  motion/                    MotionLayer (lazy GSAP), animations.ts, SplitWords
+  layout/                    Header, Footer
+  properties/                FilterBar, PropertyListingsClient, PropertyCard, Pagination, skeleton/empty/error
+  property/                  PropertyGallery, SimilarProperties, EnquiryForm
+  ui/                        AltitudeRail
+three/                       ONLY imported dynamically, via three/boot.ts
+  config.ts                  every tunable (tiers, tower, bloom, damping)
+  keyframes.ts               camera keyframes as data
+  boot.ts, engine.ts, scroll.ts, tower.ts, interior.ts, amenities.ts, city.ts, sky.ts,
+  lighting.ts, labels.ts, interaction.ts, textures.ts
+lib/                         format.ts, schema/ (query, enquiry), storage/enquiries.ts
+types/                       property.ts, enquiry.ts
+data/properties.ts           the 56 properties
+scripts/                     generate_properties.ts (npm run seed), capture-posters.mjs + make-posters.ts (posters)
+public/posters/              renders of the 3D scene (hero poster + static fallback stills)
+public/images/               property and landing photos
 notes/                       DECISIONS.md, AI_LOG.md, WALKTHROUGH.md
-docs/BRIEF.md
+tests/                       Vitest
 ```
 
-If the project does not use `src/`, keep the same structure at the root. Use the `@/` path alias.
+Use the `@/` path alias (project root).
 
 ---
 
-## 5. Data model and seed
+## 5. Data model
 
-### Property (single definition in `lib/schema/property.ts`, `type Property = z.infer<...>`)
+`Property` is defined in `types/property.ts` (id, slug, title, tagline, locality, city, price in rupees,
+priceDisplay, pricePerSqFt, bhk 1–4, bathrooms, parking, areaSqFt, type, furnished, floor, totalFloors,
+images, featured, amenities, description, specifications, coordinates, createdAt). The 56 records in
+`data/properties.ts` are generated by `scripts/generate_properties.ts` (`npm run seed`, deterministic).
+Prices are formatted as lakh/crore by `lib/format.ts`.
 
-| Field | Type | Notes |
-|---|---|---|
-| `id` | string (uuid) | |
-| `slug` | string | `kebab(title)-kebab(locality)`, unique |
-| `title` | string | e.g. "Sky Residence 3BHK with Aravalli view" |
-| `locality` | string | e.g. "Golf Course Road" |
-| `city` | string | e.g. "Gurugram" |
-| `priceInr` | integer | stored in **rupees**. Display as lakh/crore via `format.ts` |
-| `bhk` | 1–4 | |
-| `type` | `'apartment' \| 'penthouse' \| 'villa' \| 'studio' \| 'duplex'` | |
-| `furnished` | boolean | |
-| `areaSqft` | integer | realistic for BHK |
-| `bathrooms` | integer | |
-| `floor`, `totalFloors` | integer | |
-| `facing` | `'north' \| 'east' \| 'south' \| 'west' \| ...` | |
-| `amenities` | string[] | from a fixed pool |
-| `images` | `{ src, alt, width, height }[]` | 4–6 each |
-| `lat`, `lng` | number | roughly correct for the locality |
-| `description` | string | 2–3 sentences |
-| `createdAt` | ISO string | spread over the last ~120 days (for "newest" sort) |
-
-### Seed (`npm run seed`)
-- **56 properties**, deterministic (seeded PRNG) so results are stable between runs.
-- Realistic Indian data across cities: Gurugram (Golf Course Road, Sector 65, DLF Phase 5), Noida (Sector 150, Sector 128), Delhi (Vasant Vihar, Greater Kailash), Mumbai (Bandra West, Powai, Lower Parel, Worli), Bengaluru (Whitefield, Koramangala, Indiranagar), Pune (Baner, Koregaon Park), Hyderabad (Gachibowli, Jubilee Hills).
-- Prices consistent with city + BHK + type: roughly ₹45 L to ₹15 Cr.
-- Idempotent: drops/truncates and re-inserts.
-
-### Images
-- Rohit will add 12–16 photos to `public/images/properties/` (exterior, living, bedroom, kitchen, balcony; free-licence sources, credited in README).
-- Until then, `scripts/make-placeholders.ts` generates tasteful gradient placeholders with `sharp` so work is not blocked. Seed picks 4–6 images per property from the pool and records real width/height.
-
-### DB schema (`scripts/schema.sql`)
-- `properties` with indexes on `locality`, `city`, `bhk`, `price_inr`, `type`, `created_at`, plus a trigram or `ILIKE`-friendly approach for title/locality search (plain `ILIKE` is fine at this size; note it in DECISIONS).
-- `enquiries (id, property_slug, name, phone, email, message, visit_date, ip_hash, created_at)` with an index on `(ip_hash, created_at)` for rate limiting.
+If a database is added (TASKS.md → Pending 5): keep the same `Property` shape, index the filter columns
+(city, locality, bhk, price, type, created_at), and count the rate limit per `(ip_hash, created_at)`.
 
 ---
 
 ## 6. Environment variables (`.env.example`)
+
+`DATABASE_URL` and `ADMIN_PASSWORD` are not used yet (planned DB and bonus admin page).
 
 ```
 DATABASE_URL=            # Neon Postgres connection string
@@ -233,6 +167,9 @@ All responses JSON. Error shape everywhere: `{ error: string, issues?: { path: s
 - Up to 4, excluding itself. Same locality first, then same BHK, ordered by closeness in price. 404 if the slug doesn't exist.
 
 ### `POST /api/enquiries`
+
+> **As built:** `app/api/enquiries/route.ts` + `lib/storage/enquiries.ts`. Everything below works except persistence: enquiries and the rate limit are kept **in memory**, not in a table (TASKS.md → Pending 5).
+
 - Body validated with `lib/schema/enquiry.ts`:
   - `name` 2–80 chars, trimmed
   - `phone` 10-digit Indian mobile `^[6-9]\d{9}$` (normalise first: strip spaces, dashes, leading `+91`/`0`)
@@ -250,58 +187,32 @@ All responses JSON. Error shape everywhere: `{ error: string, issues?: { path: s
 
 ## 8. Route specs
 
-### 8.1 Landing `/`
+### 8.1 Landing `/` (built — see `notes/WALKTHROUGH.md` for every file)
 
-Server component. Order on the page:
+Order: `Hero` → `ScrollStory` (arrival, build, inside, pool, gym, garden, cta) → `FeaturedHomes` → `VisitInvitation`.
+Hero and story sit inside `[data-story-root]`; the 3D progress runs over that element.
 
-1. **HeroPoster** — real `<h1>` + subtitle + poster via `next/image` (`priority`, `sizes="100vw"`, AVIF). This is the LCP element. No JS needed to paint it.
-2. **SceneLoader** (small client component) decides the mode:
-   - **static** if `prefers-reduced-motion: reduce`, no WebGL2, WebGL context creation throws, or `navigator.connection?.saveData`.
-   - **3d** otherwise. Load `import('@/three/boot')` only after first paint: when the hero is visible **and** `requestIdleCallback` fires (fallback `setTimeout` ~1200 ms). The canvas sits `position: fixed` over the poster at `opacity: 0` and fades in **only after the first frame renders**. Never a blank canvas, never an error message.
-   - Listen for `webglcontextlost` → switch to static mode.
-3. **ScrollStory** — five `<section data-scene="...">` elements with fixed heights (in `vh`), each containing a sticky text panel. All text is real DOM (SEO, screen readers). The canvas is `aria-hidden`.
-4. **FeaturedHomes** — server component, 6 properties from the DB, opaque background above the canvas. No client JS except CSS hover.
+- **Hero** paints a real `<h1>` and the poster `/posters/hero.webp` (a render of our own 3D scene, `priority`) before any WebGL code downloads. The fixed canvas (z-[1]) fades in above the poster only after its first frame.
+- **SceneLoader** picks static mode for reduced motion, Save-Data, no WebGL2, or a failed/lost context; otherwise imports `@/three/boot` on `requestIdleCallback` (1.2 s fallback).
+- **Story chapters** are tall sections with a sticky stage; panels fade by `--scene-p` (written by `three/scroll.ts`). Static mode shows `/posters/<scene>.webp` stills.
+- **FeaturedHomes / VisitInvitation** are opaque `z-10` sections that cover the canvas.
 
-**Static mode:** each section shows its own poster still (captured from the real scene) with simple opacity fades via IntersectionObserver. No scrubbed camera.
+### 8.2 3D engine rules (keep these when changing `three/`)
 
-#### Scenes (global progress `p` from 0 to 1 over the ScrollStory)
-
-| # | Scene | Range | Camera / 3D | Overlay |
-|---|---|---|---|---|
-| 1 | Arrival | 0.00–0.18 | Wide shot, slow orbit (angle is a function of `p`, plus tiny idle drift), pointer parallax | "Skyline. Living above the city." fades in |
-| 2 | Build-up | 0.18–0.38 | Camera eases to a three-quarter view; floors drop into place one by one from bottom to top. Scrolling up reverses smoothly | Counter: floors / residences, driven by the same progress |
-| 3 | Inside a home | 0.38–0.62 | Camera dollies to floor 18; that floor's facade panels slide outward and fade; floor plan revealed; labels (Living, Bedroom, Kitchen, Balcony) pinned to 3D points | Text panel about the residence |
-| 4 | Amenities | 0.62–0.86 | Three camera stops: pool → gym → garden, each held briefly | One text panel per stop, synced to the stop |
-| 5 | CTA | 0.86–1.00 | Camera pulls back to a hero wide shot, scene settles | "Explore homes" → `/properties` |
-
-Keep these ranges and all camera keyframes in `three/keyframes.ts` as plain data.
-
-### 8.2 3D engine spec
-
-**Golden rule: every visual is a pure function of the damped progress.** No timers, no stateful tweens. That's what makes fast scrolling and reversing smooth, and it's easy to explain.
-
-- **engine.ts**
-  - `WebGLRenderer({ antialias: dpr <= 1, powerPreference: 'high-performance', alpha: false })`
-  - `setPixelRatio(Math.min(devicePixelRatio, tier === 'high' ? 2 : 1.5))`
-  - sRGB output, ACES filmic tone mapping
-  - Loop with `renderer.setAnimationLoop`. Pause when the ScrollStory is not intersecting (observe the story container, since the canvas is fixed) or `document.hidden`. Resume on return.
-  - `ResizeObserver` for size; re-measure sections on resize.
-  - Clamp frame delta to ≤ 1/30 s so returning from a background tab doesn't jump.
-  - `dispose()` releases geometries, materials, textures, renderer, observers and listeners. Must survive React Strict Mode double-mount and route changes without leaks or duplicate canvases.
-  - **Quality tiers:** `high` (desktop) and `low` (touch device or `hardwareConcurrency <= 4`): fewer floors, no real-time shadows, lower DPR.
-- **scroll.ts** — cache section offsets (no `getBoundingClientRect` every frame). Per frame: target = raw progress from `scrollY`; `current = MathUtils.damp(current, target, 8, dt)`; expose global `p` and per-scene local progress `clamp((p - start) / (end - start), 0, 1)`. Write each scene's local progress to its section as CSS variable `--scene-p`.
-- **keyframes.ts** — `{ at: number, position: [x,y,z], target: [x,y,z] }[]`. Interpolate position and look-at target between neighbouring keyframes with an ease-in-out curve (or a Catmull-Rom curve through the positions for smoother paths).
-- **tower.ts** — procedural. Desktop ~28 floors, low tier ~20. Each floor is a group (slab + glass band + balcony rail) so build-up can offset y and opacity per floor: floor `i` lands when build progress passes `i / N`, with an eased drop. Repeated details (mullions, balcony rails) use `InstancedMesh`. Glass: `MeshStandardMaterial` with low roughness, slight metalness, env reflections, and an emissive window strip for night.
-- **interior.ts** — floor 18 contains a simple floor plan: thin wall boxes, coloured zone floors (living, bedroom, kitchen, balcony), a few furniture blocks. Visible only around scene 3.
-- **labels.ts** — anchors are `Vector3`s. Every frame: `vector.clone().project(camera)` → screen coords → set `transform: translate3d()` on the DOM label. Hide when behind the camera or outside scene 3. Labels are real DOM text.
-- **amenities.ts** — pool on the podium (plane with reflective water material, subtle animated normal offset), gym (simple procedural equipment), garden (instanced low-poly trees). Optional CC0 GLB from Kenney/Poly Pizza, compressed (below).
-- **lighting.ts** — `PMREMGenerator` + `RoomEnvironment` (no HDR download), hemisphere light, directional "sun". `high` tier: soft shadows (shadow map 1024, PCF soft) on tower and ground. `low` tier: no shadows; a radial-gradient contact shadow texture generated with a canvas (0 KB download). Day/night presets as plain objects (bonus toggle): sky colour, sun colour/intensity, env intensity, window emissive.
-- **interaction.ts** — pointer parallax (damped camera offset, small amplitude, disabled on touch). Raycast hover on floors in scenes 1, 2 and 5: highlight floor emissive and show a DOM tooltip like "Floor 18 · 3 BHK". Throttle raycasts to pointer movement, not every frame.
-- **capture.ts** (dev only, never shipped in production code paths) — with `?capture=1`, jump to fixed progress values, render, and download PNGs of the hero and each scene. `scripts/make-posters.ts` converts them to AVIF + WebP at 640/1024/1600 widths in `public/posters/`. These are the hero poster, reduced-motion stills and no-WebGL fallback.
-- **Assets ≤ 2 MB.** If any GLB is used: `npx @gltf-transform/cli optimize in.glb out.glb --compress meshopt --texture-compress webp`. Prefer **Meshopt** over Draco (smaller decoder, no extra wasm/decoder files to host). Record the choice and sizes in DECISIONS.md.
-- Zero console warnings: use only non-deprecated APIs for the installed three version.
+- **Every visual is a pure function of the damped progress** (plus tiny idle motion: water, fire, beacon, camera drift). No timers, no stateful tweens.
+- Section offsets are measured once and on resize, never per frame. Camera keyframes are tied to scenes (scene id + local 0..1).
+- Tiers: `high` (desktop) DPR ≤ 2, shadows, bloom; `low` (touch or ≤ 4 cores) DPR ≤ 1.5, no shadows, no bloom. Both keep 28 floors.
+- Loop pauses when the story root is off-screen or the tab is hidden; frame delta clamped to 1/30 s.
+- `dispose()` releases everything and forces context loss; must survive Strict Mode double-mount and route changes (one canvas only).
+- Labels and amenity cards are real DOM, positioned by projecting 3D anchors (`three/labels.ts`).
+- No downloaded assets: textures are drawn on canvas, reflections from `RoomEnvironment`. If a GLB is ever added: Meshopt + WebP textures, total ≤ 2 MB.
+- Zero console warnings: only non-deprecated APIs of the installed three version (e.g. `PCFShadowMap`, not `PCFSoftShadowMap`). `renderer.debug.checkShaderErrors` is off in production.
+- After changing the look, re-render the posters (`TASKS.md` → Things to know).
 
 ### 8.3 Listings `/properties`
+
+> **As built:** `app/properties/page.tsx` (server) + `components/properties/PropertyListingsClient.tsx` + `FilterBar.tsx`. Query parsing and validation live in `lib/schema/query.ts` (there is no `lib/query/` folder and no DB; data comes from `data/properties.ts`). Do not rebuild these; fix what TASKS.md lists.
+
 
 - `page.tsx` (server) parses `searchParams` **leniently** with the shared schema (invalid values are dropped, not errored), queries the DB directly (not via HTTP to its own API), renders `<PropertiesView initialQuery initialData />`. `generateMetadata` reflects the query (e.g. "3 BHK homes in Powai · Skyline").
 - **URL is the source of truth.** `lib/query/parse.ts` and `lib/query/serialize.ts` are pure functions: `URLSearchParams → Query` and `Query → string` with canonical param order and defaults omitted. Unit-test these.
@@ -322,6 +233,9 @@ Keep these ranges and all camera keyframes in `three/keyframes.ts` as plain data
 - **Card:** `next/image` with `sizes`, fixed aspect ratio; above-the-fold images not lazy, rest lazy. CSS hover (image scale + lift). Price formatted as lakh/crore.
 
 ### 8.4 Detail `/properties/[slug]`
+
+> **As built:** `app/properties/[slug]/page.tsx`, `components/property/*`.
+
 
 - `generateStaticParams` for all seeded slugs + `export const revalidate = 3600`. Unknown slug → `notFound()` → a designed 404 with a link back to listings.
 - `generateMetadata`: title, description, canonical URL, Open Graph image (first property image).
@@ -346,7 +260,7 @@ Keep these ranges and all camera keyframes in `three/keyframes.ts` as plain data
 
 ## 9. Design system
 
-**Theme: "Skyline at Dusk".** All pages dark, matching the approved mockup (`docs/mockup-v1.png`); see `LANDING_V1_PLAN.md` §2 and §5.
+**Theme: "Skyline at Dusk".** All pages dark, matching the approved mockup (`docs/mockup-v1.png`). The 3D uses the same palette: blue hour to night, warm gold light, brass accents.
 
 | Token | Value | Use |
 |---|---|---|
@@ -385,27 +299,9 @@ Keep these ranges and all camera keyframes in `three/keyframes.ts` as plain data
 
 ---
 
-## 11. Milestones (in order) with acceptance checks
+## 11. Work order
 
-**M0 — Audit & foundations.** Section 1 checklist done. Design tokens, fonts, layout, header/footer, Container, Button, Input. ✅ Build passes, empty pages render with the theme.
-
-**M1 — Data & API.** Schemas, DB client, `schema.sql`, seed (56 properties), placeholder images, all four endpoints, rate limit, caching headers. ✅ curl examples for each status code (200/201/400/404/429) documented in `notes/WALKTHROUGH.md` and verified.
-
-**M2 — Listings.** Filter↔URL logic (+ unit tests), SSR first page, filters UI, abortable fetching, all states, pagination, scroll restoration. ✅ Every listings item in section 10 manually verified; budget ≤ 120 KB.
-
-**M3 — Detail + enquiry.** SSG + revalidate, metadata/OG, gallery, specs, location, similar, form with all states. ✅ 404 works; form failure cases verified; budget ≤ 120 KB.
-
-**M4 — Landing shell (no 3D yet).** Hero poster (temporary image), ScrollStory sections with text panels, static-mode behaviour, FeaturedHomes. ✅ Lighthouse mobile ≥ 90 on `/`; LCP is the hero.
-
-**M5 — 3D core.** SceneLoader lazy load, engine (DPR cap, pause, dispose, tiers), scroll progress, keyframes, tower + build-up, lighting. Scenes 1–2. ✅ 3D chunk ≤ 200 KB gz; smooth both directions; no console warnings.
-
-**M6 — 3D story complete.** Scenes 3–5, labels, amenities, hover + parallax, CSS-variable-driven overlays, context-loss fallback. Capture posters → replace temporary hero poster and static stills. ✅ Overlays in sync on every scene; ~60 fps on a laptop; usable on a mid-range phone (low tier).
-
-**M7 — Polish & verification.** Responsive pass, accessibility pass, micro-interactions, Lighthouse on the **deployed** site for `/`, `/properties`, one detail page, bundle analyzer report. Save all to `/reports`. ✅ All budgets met or gaps documented honestly.
-
-**M8 — Docs.** README, help Rohit draft `AI_USAGE.md` from `notes/AI_LOG.md` (he writes the final version in his own words). ✅ Every deliverable in section 12 present.
-
-**M9 — Bonus (only if core is solid).** Favourites in `localStorage` with optimistic UI → day/night toggle → Playwright e2e → `/admin` → view transitions.
+Milestones M0–M6 are done. Remaining work, in order, is `TASKS.md` → Pending.
 
 ---
 

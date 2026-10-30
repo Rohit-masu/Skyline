@@ -1,3 +1,3 @@
 @AGENTS.md
 
-All project instructions live in AGENTS.md. Read it fully before starting, follow the milestones in order, and keep notes/DECISIONS.md, notes/AI_LOG.md and notes/WALKTHROUGH.md up to date.
+Start with TASKS.md (status and pending work), then AGENTS.md (rules, requirements, architecture). Keep TASKS.md, notes/DECISIONS.md, notes/AI_LOG.md and notes/WALKTHROUGH.md up to date with every change.
