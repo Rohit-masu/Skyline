@@ -3,7 +3,6 @@ import { ArrowUpRight } from "lucide-react";
 import { getFeaturedProperties, getPortfolioStats } from "@/lib/properties";
 import { TOTAL_FLOORS } from "@/lib/site";
 import { FeaturedCard } from "./FeaturedCard";
-import { CurvedTransition } from "./CurvedTransition";
 
 const FEATURED_COUNT = 6;
 
@@ -11,28 +10,36 @@ const FEATURED_COUNT = 6;
 // row below. Rows have a fixed height, so nothing shifts while images load.
 const TILE_CLASSES = ["lg:col-span-2 lg:row-span-2", "", "", "", "", ""];
 
-// Opaque background (and z-10) with curved atmospheric transition so it smoothly envelopes
-// the fixed 3D canvas once the story ends, eliminating any sudden hard cuts.
 export function FeaturedHomes() {
   const featured = getFeaturedProperties(FEATURED_COUNT);
   const stats = getPortfolioStats();
   const lowestCrore = (stats.lowestPrice / 10_000_000).toFixed(1);
 
   return (
-    <section id="featured" aria-labelledby="featured-title" className="relative z-10 bg-ink pt-0 pb-16 sm:pb-24">
-      {/* Smooth Curved Architectural Horizon Transition from 3D Story into Section 06 */}
-      <div className="-mt-14 sm:-mt-20 lg:-mt-24 relative z-20">
-        <CurvedTransition glow={true} />
+    <section id="featured" aria-labelledby="featured-title" className="relative z-10 bg-ink pt-16 sm:pt-24 pb-24 sm:pb-32">
+      {/* 
+        Atmospheric Dusk Transition (Story -> Section 06):
+        An extended multi-layered gradient veil and ambient radial bloom that dissolves 
+        the fixed 3D canvas into the ink background with zero harsh cuts or static edges.
+      */}
+      <div className="pointer-events-none absolute -top-40 sm:-top-56 inset-x-0 h-40 sm:h-56 bg-gradient-to-t from-ink via-ink/85 via-ink/30 to-transparent select-none" aria-hidden="true">
+        {/* Soft golden twilight bloom radiating upward */}
+        <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-4/5 max-w-5xl h-48 rounded-full bg-[radial-gradient(ellipse_at_bottom,_rgba(201,163,106,0.14)_0%,_rgba(28,37,51,0.08)_50%,_transparent_75%)] blur-3xl opacity-80" />
       </div>
 
-      <div className="section-inner space-y-12 sm:space-y-16 pt-6 sm:pt-10">
+      {/* GSAP-scrubbed hairline that elegantly draws across as user reaches this section */}
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-px overflow-hidden" aria-hidden="true">
+        <div data-draw-line className="h-full w-full bg-gradient-to-r from-transparent via-brass/40 to-transparent origin-left" />
+      </div>
+
+      <div className="section-inner space-y-12 sm:space-y-16">
         {/* Eyebrow */}
         <p data-reveal className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.35em] text-brass">
           <span aria-hidden="true" className="h-px w-10 bg-brass/60" />
           06 — The Residence Collection
         </p>
 
-        {/* 3-Column Editorial Header: Title | Intro | Inline Stats & CTA */}
+        {/* 3-Column Editorial Masthead: Title | Intro | Inline Stats & CTA */}
         <div className="grid grid-cols-1 items-end gap-8 lg:grid-cols-12">
           {/* Column 1: Main Title */}
           <div className="lg:col-span-5">
@@ -103,10 +110,11 @@ export function FeaturedHomes() {
         </ul>
       </div>
 
-      {/* Smooth Transition (6 -> 7) matching the design */}
-      <div className="mt-16 sm:mt-24 lg:mt-32">
-        <CurvedTransition inverted={true} />
-      </div>
+      {/* 
+        Atmospheric Transition into Section 07 (Visit Pavilion):
+        Gentle atmospheric dusk dissolution maintaining visual continuity
+      */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-32 bg-gradient-to-b from-transparent to-ink/90 select-none" aria-hidden="true" />
     </section>
   );
 }
