@@ -83,10 +83,26 @@ export function PropertyListingsClient({ initialQuery, initialData }: PropertyLi
         ) : (
           <>
             {/* Keyed by the query so a new result set fades in instead of swapping in place. */}
-            <div key={queryKey} className="grid animate-fade-in grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {data.items.map((property, index) => (
-                <PropertyCard key={property.id} property={property} priority={index < 3} />
-              ))}
+            <div
+              key={queryKey}
+              className="grid animate-fade-in auto-rows-[26rem] grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:auto-rows-[21rem] lg:grid-cols-3"
+            >
+              {data.items.map((property, index) => {
+                const isHeroTile = index === 0;
+                return (
+                  <div
+                    key={property.id}
+                    className={isHeroTile ? "lg:col-span-2 lg:row-span-2 h-full" : "h-full"}
+                  >
+                    <PropertyCard
+                      property={property}
+                      priority={index < 3}
+                      index={index}
+                      large={isHeroTile}
+                    />
+                  </div>
+                );
+              })}
             </div>
             <Pagination
               page={query.page}

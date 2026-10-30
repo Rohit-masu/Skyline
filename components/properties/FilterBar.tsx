@@ -69,10 +69,10 @@ export function FilterBar({ query, onFiltersChange, onSearchChange, onReset, tot
         </div>
       </div>
 
-      <div className="hidden items-center justify-between gap-4 rounded-2xl border border-white/5 bg-[#0e1624]/60 p-3 lg:flex">
+      <div className="hidden items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#0e1624]/80 p-3 shadow-lg backdrop-blur-md lg:flex">
         <FilterControls query={query} onChange={onFiltersChange} idPrefix="desktop" layout="row" />
         {hasActiveFilters(query) && (
-          <button type="button" onClick={onReset} className="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-brass hover:text-brass-light">
+          <button type="button" onClick={onReset} className="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-brass hover:text-brass-light font-mono">
             <RotateCcw aria-hidden="true" className="h-3.5 w-3.5" />
             Reset all
           </button>

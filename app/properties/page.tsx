@@ -7,7 +7,8 @@ import { Footer } from "@/components/layout/Footer";
 import { PropertyListingsClient } from "@/components/properties/PropertyListingsClient";
 import { PropertyListingsSkeleton } from "@/components/properties/PropertySkeleton";
 import { PAGE_SIZE, parseQueryLenient, type PropertyQuery } from "@/lib/schema/query";
-import { searchProperties } from "@/lib/properties";
+import { getPortfolioStats, searchProperties } from "@/lib/properties";
+import { TOTAL_FLOORS } from "@/lib/site";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -40,6 +41,9 @@ async function Listings({ searchParams }: { searchParams: SearchParams }) {
 }
 
 export default function PropertiesPage({ searchParams }: { searchParams: SearchParams }) {
+  const stats = getPortfolioStats();
+  const lowestCrore = (stats.lowestPrice / 10_000_000).toFixed(1);
+
   return (
     <div className="flex min-h-screen flex-col bg-ink text-ivory selection:bg-brass selection:text-ink">
       <Header />
@@ -57,18 +61,40 @@ export default function PropertiesPage({ searchParams }: { searchParams: SearchP
           </ol>
         </nav>
 
-        <header className="mb-12 max-w-3xl space-y-4">
-          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.3em] text-brass">
-            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-brass" />
-            Portfolio 2026 · 56 residences
-          </p>
-          <h1 className="font-display text-4xl font-light leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-            Skyline <span className="italic text-brass">Residences</span>
-          </h1>
-          <p className="text-base font-light leading-relaxed text-mist sm:text-lg">
-            From light-filled sky apartments and duplex penthouses to private garden villas, find the home that fits
-            how you live.
-          </p>
+        {/* Editorial Masthead with Inline Stats matching the Reference Image */}
+        <header className="mb-12 grid grid-cols-1 items-end justify-between gap-8 lg:grid-cols-12 border-b border-white/5 pb-10">
+          <div className="space-y-4 lg:col-span-8">
+            <p className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.3em] text-brass">
+              <span aria-hidden="true" className="h-px w-8 bg-brass" />
+              Portfolio 2026 · {stats.homes} residences
+            </p>
+            <h1 className="font-display text-4xl font-light leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+              Skyline <span className="italic text-brass">Residences</span>
+            </h1>
+            <p className="max-w-2xl text-base font-light leading-relaxed text-mist">
+              From light-filled sky apartments and duplex penthouses to private garden villas, find the home that fits
+              how you live.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-5 sm:gap-8 lg:col-span-4 lg:justify-end">
+            <div className="flex flex-col">
+              <span className="font-display text-2xl font-light text-ivory sm:text-3xl">{stats.homes}</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-mist/80">Residences</span>
+            </div>
+            <span className="h-8 w-px bg-white/10" aria-hidden="true" />
+            <div className="flex flex-col">
+              <span className="font-display text-2xl font-light text-ivory sm:text-3xl">{TOTAL_FLOORS}</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-mist/80">Floors</span>
+            </div>
+            <span className="h-8 w-px bg-white/10" aria-hidden="true" />
+            <div className="flex flex-col">
+              <span className="font-display text-2xl font-light text-ivory sm:text-3xl">
+                ₹{lowestCrore}<span className="text-xl text-brass"> Cr</span>
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-mist/80">Starting price</span>
+            </div>
+          </div>
         </header>
 
         <Suspense fallback={<PropertyListingsSkeleton count={PAGE_SIZE} />}>
